@@ -16,7 +16,6 @@
             background-color: #000000;
             color: #ffffff;
         }
-        /* Estilo de botón verde radiactivo */
         .btn-radioactive {
             background-color: #00FF66;
             color: #000000;
@@ -29,13 +28,6 @@
             box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
             transform: translateY(-1px);
         }
-        .border-radioactive {
-            border-color: #00FF66;
-        }
-        .text-radioactive {
-            color: #00FF66;
-        }
-        /* Barra de desplazamiento personalizada */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -82,16 +74,15 @@
         <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo</h2>
-                    <p class="text-sm text-zinc-400">Encuentra los mejores puntos de conexión en los edificios A, B y C (Pisos 1 al 6).</p>
+                    <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo (Nube)</h2>
+                    <p class="text-sm text-zinc-400">Puntos compartidos en tiempo real para todos los usuarios.</p>
                 </div>
-                <!-- Indicador de Estado Global -->
                 <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
                     <span class="relative flex h-3 w-3">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-3 w-3 bg-[#00FF66]"></span>
                     </span>
-                    <span class="text-xs font-medium text-zinc-300">Sincronizado en tiempo real</span>
+                    <span class="text-xs font-medium text-zinc-300">Conectado a la Nube</span>
                 </div>
             </div>
 
@@ -108,12 +99,10 @@
 
             <!-- Filtros Secundarios y Búsqueda -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-zinc-900">
-                <!-- Barra de Búsqueda -->
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-zinc-500 text-sm"></i>
                     <input type="text" id="searchInput" oninput="filterPoints()" placeholder="Buscar por nombre o lugar..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
-                <!-- Filtro por Piso -->
                 <div>
                     <select id="floorFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="">Todos los Pisos (1-6)</option>
@@ -125,7 +114,6 @@
                         <option value="Piso 6">Piso 6</option>
                     </select>
                 </div>
-                <!-- Filtro por Calidad de Señal -->
                 <div>
                     <select id="signalFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="">Todas las Calidades</option>
@@ -142,13 +130,13 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-white flex items-center space-x-2">
                     <i class="fa-solid fa-list text-[#00FF66]"></i>
-                    <span>Puntos Registrados</span>
+                    <span>Puntos Registrados en Vivo</span>
                 </h3>
                 <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
             </div>
             
             <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Las tarjetas dinámicas se cargan aquí -->
+                <!-- Tarjetas cargadas desde Firebase -->
             </div>
         </section>
     </main>
@@ -161,7 +149,7 @@
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
                         <i class="fa-solid fa-plus text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white">Registrar Punto de Señal</h3>
+                    <h3 class="text-lg font-bold text-white">Registrar Punto en la Nube</h3>
                 </div>
                 <button onclick="closeModal()" class="text-zinc-400 hover:text-white p-2">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -169,13 +157,11 @@
             </div>
 
             <form id="pointForm" onsubmit="savePoint(event)" class="space-y-4">
-                <!-- Nombre -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Nombre del Punto / Ubicación:</label>
                     <input type="text" id="pointName" required placeholder="Ej: Aula 302, Cafetería Central..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
 
-                <!-- Edificio y Piso -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Edificio:</label>
@@ -198,7 +184,6 @@
                     </div>
                 </div>
 
-                <!-- Detector Automático -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
@@ -210,24 +195,21 @@
                             <span>Re-escanear</span>
                         </button>
                     </div>
-                    <div id="detectorStatus" class="text-xs text-zinc-400">
-                        Analizando red actual del dispositivo...
-                    </div>
+                    <div id="detectorStatus" class="text-xs text-zinc-400">Analizando red actual...</div>
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800 text-xs">
                         <div>
-                            <span class="text-zinc-500">Señal Detectada:</span>
+                            <span class="text-zinc-500">Señal:</span>
                             <span id="detectedQualityLabel" class="font-bold text-white ml-1">Calculando...</span>
                         </div>
                         <div>
-                            <span class="text-zinc-500">Velocidad (Downlink):</span>
+                            <span class="text-zinc-500">Velocidad:</span>
                             <span id="detectedSpeedLabel" class="font-bold text-white ml-1">-</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estado Final Ajustable -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Calificación Final (Ajustable):</label>
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Calificación Final:</label>
                     <select id="pointStatus" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="Buena">Buena (Óptima)</option>
                         <option value="Regular">Regular (Media)</option>
@@ -235,7 +217,6 @@
                     </select>
                 </div>
 
-                <!-- Subir Foto -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Fotografía del Lugar:</label>
                     <div class="flex items-center space-x-3">
@@ -250,18 +231,17 @@
                     </div>
                 </div>
 
-                <!-- Botón de Envío -->
                 <div class="pt-4">
                     <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Guardar y Publicar Punto</span>
+                        <span>Publicar en la Nube</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Autenticación para Borrar Puntos -->
+    <!-- Modal: Administrador -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -277,78 +257,49 @@
             </div>
 
             <div class="space-y-4">
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                    Para restablecer o borrar todos los puntos guardados del sistema, introduce la contraseña de administrador.
-                </p>
-                
+                <p class="text-xs text-zinc-400 leading-relaxed">Introduce la contraseña de administrador para borrar todos los registros de la nube.</p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
                     <input type="password" id="adminPasswordInput" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500">
                     <p id="deleteErrorMsg" class="text-xs text-red-400 hidden pt-1">Contraseña incorrecta.</p>
                 </div>
-
                 <div class="flex space-x-3 pt-2">
-                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="verifyAndDeletePoints()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">
-                        Borrar Todo
-                    </button>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
+                    <button type="button" onclick="verifyAndDeletePoints()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">Borrar Todo</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Lógica de JavaScript -->
-    <script>
-        const defaultPoints = [
-            {
-                id: 1,
-                name: "Auditorio Principal (Plenaria)",
-                building: "Edificio A",
-                floor: "Piso 1",
-                status: "Buena",
-                speed: "45 Mbps (Alta velocidad)",
-                photo: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80",
-                date: "Hace 10 min"
-            },
-            {
-                id: 2,
-                name: "Laboratorio de Sistemas 3",
-                building: "Edificio B",
-                floor: "Piso 3",
-                status: "Buena",
-                speed: "60 Mbps (Fibra óptica)",
-                photo: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80",
-                date: "Hace 25 min"
-            },
-            {
-                id: 3,
-                name: "Pasillo Sur (Zona Oscura)",
-                building: "Edificio C",
-                floor: "Piso 5",
-                status: "Mala",
-                speed: "1.2 Mbps (Sin cobertura)",
-                photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80",
-                date: "Hace 1 hora"
-            }
-        ];
+    <!-- Integración de Firebase y Lógica -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let points = JSON.parse(localStorage.getItem('searchconnect_points')) || defaultPoints;
+        const firebaseConfig = {
+            apiKey: "AIzaSyBArSYKqpqeuTxmz3f1HkJMlSHF6YQbHBY",
+            authDomain: "searchconnect-6ef24.firebaseapp.com",
+            projectId: "searchconnect-6ef24",
+            storageBucket: "searchconnect-6ef24.appspot.com",
+            messagingSenderId: "603518573160",
+            appId: "1:603518573160:web:7489070b2ba7eee00379dd",
+            measurementId: "G-SYJFHBFZMT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let points = [];
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
 
-        function saveToStorage() {
-            localStorage.setItem('searchconnect_points', JSON.stringify(points));
-        }
-
-        function openModal() {
+        window.openModal = function() {
             document.getElementById('registerModal').classList.remove('hidden');
             document.getElementById('registerModal').classList.add('flex');
             detectSignal();
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             document.getElementById('registerModal').classList.remove('flex');
             document.getElementById('registerModal').classList.add('hidden');
             document.getElementById('pointForm').reset();
@@ -357,33 +308,19 @@
             document.getElementById('photoPreviewContainer').classList.add('hidden');
         }
 
-        function openDeleteModal() {
+        window.openDeleteModal = function() {
             document.getElementById('adminPasswordInput').value = '';
             document.getElementById('deleteErrorMsg').classList.add('hidden');
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('deleteModal').classList.add('flex');
         }
 
-        function closeDeleteModal() {
+        window.closeDeleteModal = function() {
             document.getElementById('deleteModal').classList.remove('flex');
             document.getElementById('deleteModal').classList.add('hidden');
         }
 
-        function verifyAndDeletePoints() {
-            const pwdInput = document.getElementById('adminPasswordInput').value;
-            const errorMsg = document.getElementById('deleteErrorMsg');
-
-            if (pwdInput === "Admin12345678") {
-                points = [];
-                saveToStorage();
-                renderPoints();
-                closeDeleteModal();
-            } else {
-                errorMsg.classList.remove('hidden');
-            }
-        }
-
-        function setBuildingFilter(bld) {
+        window.setBuildingFilter = function(bld) {
             activeBuildingFilter = bld;
             document.querySelectorAll('.filter-bld').forEach(btn => {
                 if (btn.getAttribute('data-bld') === bld) {
@@ -392,47 +329,38 @@
                     btn.className = 'filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]';
                 }
             });
-            filterPoints();
+            renderPoints();
         }
 
-        function detectSignal() {
+        window.detectSignal = function() {
             const statusEl = document.getElementById('detectorStatus');
             const qualityLabel = document.getElementById('detectedQualityLabel');
             const speedLabel = document.getElementById('detectedSpeedLabel');
             const statusSelect = document.getElementById('pointStatus');
 
-            statusEl.innerText = "Midiendo latencia y tipo de conexión...";
-            
+            statusEl.innerText = "Midiendo red actual...";
             setTimeout(() => {
                 const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                let speed = "Desconocida";
-                let quality = "Regular";
+                let speed = "18.5 Mbps";
+                let quality = "Buena";
 
                 if (conn) {
                     const downlink = conn.downlink ? conn.downlink + ' Mbps' : 'Estable';
                     const effectiveType = conn.effectiveType ? conn.effectiveType.toUpperCase() : '4G';
                     speed = `${downlink} (${effectiveType})`;
-
-                    if (conn.downlink > 10 || effectiveType === '4G' || effectiveType === '5G') {
-                        quality = 'Buena';
-                    } else if (conn.downlink > 3) {
-                        quality = 'Regular';
-                    } else {
-                        quality = 'Mala';
-                    }
-                } else {
-                    speed = "18.5 Mbps (Red Móvil/Wi-Fi)";
-                    quality = 'Buena';
+                    if (conn.downlink > 10 || effectiveType === '4G') quality = 'Buena';
+                    else if (conn.downlink > 3) quality = 'Regular';
+                    else quality = 'Mala';
                 }
 
-                statusEl.innerHTML = `<span class="text-[#00FF66] font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Detección completada con éxito.</span>`;
+                statusEl.innerHTML = `<span class="text-[#00FF66] font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Detectado con éxito.</span>`;
                 qualityLabel.innerText = quality;
                 speedLabel.innerText = speed;
                 statusSelect.value = quality;
             }, 400);
         }
 
-        function handlePhotoUpload(event) {
+        window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
             if (file) {
                 document.getElementById('photoFileName').innerText = file.name;
@@ -447,7 +375,22 @@
             }
         }
 
-        function savePoint(e) {
+        // Cargar puntos de la nube
+        async function loadPointsFromCloud() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "points"));
+                points = [];
+                querySnapshot.forEach((documento) => {
+                    points.push({ id: documento.id, ...documento.data() });
+                });
+                renderPoints();
+            } catch (error) {
+                console.error("Error al cargar de Firebase:", error);
+            }
+        }
+
+        // Guardar punto en la nube
+        window.savePoint = async function(e) {
             e.preventDefault();
             const name = document.getElementById('pointName').value.trim();
             const building = document.getElementById('pointBuilding').value;
@@ -456,7 +399,6 @@
             const speed = document.getElementById('detectedSpeedLabel').innerText || "Red Universitaria";
 
             const newPoint = {
-                id: Date.now(),
                 name,
                 building,
                 floor,
@@ -466,13 +408,37 @@
                 date: 'Recién registrado'
             };
 
-            points.unshift(newPoint);
-            saveToStorage();
-            closeModal();
-            renderPoints();
+            try {
+                await addDoc(collection(db, "points"), newPoint);
+                closeModal();
+                loadPointsFromCloud();
+            } catch (error) {
+                console.error("Error al guardar en Firebase:", error);
+                alert("Hubo un error al guardar en la nube.");
+            }
         }
 
-        function renderPoints() {
+        window.verifyAndDeletePoints = async function() {
+            const pwdInput = document.getElementById('adminPasswordInput').value;
+            const errorMsg = document.getElementById('deleteErrorMsg');
+
+            if (pwdInput === "Admin12345678") {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "points"));
+                    for (const documento of querySnapshot.docs) {
+                        await deleteDoc(doc(db, "points", documento.id));
+                    }
+                    loadPointsFromCloud();
+                    closeDeleteModal();
+                } catch (error) {
+                    console.error("Error al borrar elementos:", error);
+                }
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        window.renderPoints = function() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const floorVal = document.getElementById('floorFilter').value;
             const signalVal = document.getElementById('signalFilter').value;
@@ -492,7 +458,7 @@
                 grid.innerHTML = `
                     <div class="col-span-full py-12 text-center bg-zinc-950 border border-zinc-900 rounded-2xl">
                         <i class="fa-solid fa-triangle-exclamation text-zinc-600 text-3xl mb-3"></i>
-                        <p class="text-sm text-zinc-400">No se encontraron puntos con los filtros seleccionados.</p>
+                        <p class="text-sm text-zinc-400">No hay puntos registrados en la nube todavía.</p>
                     </div>
                 `;
                 return;
@@ -520,7 +486,6 @@
                 return `
                     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between">
                         <div>
-                            <!-- Cabecera con Foto -->
                             <div class="h-44 w-full relative overflow-hidden bg-zinc-900">
                                 <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover">
                                 <div class="absolute top-3 left-3 bg-black/70 backdrop-blur border border-zinc-800 px-3 py-1 rounded-xl text-xs font-bold text-white">
@@ -530,12 +495,8 @@
                                     ${p.status}
                                 </div>
                             </div>
-
-                            <!-- Cuerpo de la Tarjeta -->
                             <div class="p-5 space-y-4">
                                 <h4 class="text-base font-bold text-white">${p.name}</h4>
-                                
-                                <!-- Barra de Intensidad -->
                                 <div class="space-y-1.5">
                                     <div class="flex justify-between text-xs">
                                         <span class="text-zinc-400">Intensidad de Señal</span>
@@ -547,22 +508,21 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Pie de la Tarjeta -->
                         <div class="px-5 py-3 bg-zinc-900/50 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-500">
                             <span><i class="fa-regular fa-clock mr-1"></i> ${p.date}</span>
-                            <span class="text-zinc-400 font-medium">SearchConnect Verified</span>
+                            <span class="text-zinc-400 font-medium">SearchConnect Cloud</span>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function filterPoints() {
+        window.filterPoints = function() {
             renderPoints();
         }
 
-        renderPoints();
+        // Cargar al iniciar la página
+        loadPointsFromCloud();
     </script>
 </body>
 </html>
