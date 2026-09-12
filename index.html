@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SearchConnect - Red de Señal Universitaria</title>
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS para el diseño -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for icons -->
+    <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -16,7 +16,7 @@
             background-color: #000000;
             color: #ffffff;
         }
-        /* Radioactive green glowing button effect */
+        /* Estilo de botón verde radiactivo */
         .btn-radioactive {
             background-color: #00FF66;
             color: #000000;
@@ -35,7 +35,7 @@
         .text-radioactive {
             color: #00FF66;
         }
-        /* Custom Scrollbar */
+        /* Barra de desplazamiento personalizada */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -50,7 +50,7 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#00FF66] selection:text-black">
 
-    <!-- Header / Navbar -->
+    <!-- Encabezado / Navbar -->
     <header class="border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -75,17 +75,17 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Contenido Principal -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        <!-- Hero & Filters Section -->
+        <!-- Sección Hero y Filtros -->
         <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo</h2>
                     <p class="text-sm text-zinc-400">Encuentra los mejores puntos de conexión en los edificios A, B y C (Pisos 1 al 6).</p>
                 </div>
-                <!-- Global Status Indicator -->
+                <!-- Indicador de Estado Global -->
                 <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
                     <span class="relative flex h-3 w-3">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
@@ -95,7 +95,7 @@
                 </div>
             </div>
 
-            <!-- Quick Building Buttons Filter -->
+            <!-- Filtros Rápidos por Edificio -->
             <div class="space-y-2">
                 <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Filtrar por Edificio:</label>
                 <div class="flex flex-wrap gap-2" id="building-filters">
@@ -106,14 +106,14 @@
                 </div>
             </div>
 
-            <!-- Secondary Filters & Search -->
+            <!-- Filtros Secundarios y Búsqueda -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-zinc-900">
-                <!-- Search Input -->
+                <!-- Barra de Búsqueda -->
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-zinc-500 text-sm"></i>
                     <input type="text" id="searchInput" oninput="filterPoints()" placeholder="Buscar por nombre o lugar..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
-                <!-- Floor Filter -->
+                <!-- Filtro por Piso -->
                 <div>
                     <select id="floorFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="">Todos los Pisos (1-6)</option>
@@ -125,7 +125,7 @@
                         <option value="Piso 6">Piso 6</option>
                     </select>
                 </div>
-                <!-- Signal Quality Filter -->
+                <!-- Filtro por Calidad de Señal -->
                 <div>
                     <select id="signalFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="">Todas las Calidades</option>
@@ -137,7 +137,7 @@
             </div>
         </section>
 
-        <!-- Points Grid -->
+        <!-- Cuadrícula de Puntos -->
         <section>
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-white flex items-center space-x-2">
@@ -148,12 +148,12 @@
             </div>
             
             <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Dynamic Cards injected here -->
+                <!-- Las tarjetas dinámicas se cargan aquí -->
             </div>
         </section>
     </main>
 
-    <!-- Modal: Register New Point -->
+    <!-- Modal: Registrar Nuevo Punto -->
     <div id="registerModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-4 border-b border-zinc-900">
@@ -169,13 +169,13 @@
             </div>
 
             <form id="pointForm" onsubmit="savePoint(event)" class="space-y-4">
-                <!-- Name -->
+                <!-- Nombre -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Nombre del Punto / Ubicación:</label>
                     <input type="text" id="pointName" required placeholder="Ej: Aula 302, Cafetería Central..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
 
-                <!-- Building & Floor Grid -->
+                <!-- Edificio y Piso -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Edificio:</label>
@@ -198,7 +198,7 @@
                     </div>
                 </div>
 
-                <!-- Auto-Detector Box -->
+                <!-- Detector Automático -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
@@ -225,7 +225,7 @@
                     </div>
                 </div>
 
-                <!-- Manual Override Status -->
+                <!-- Estado Final Ajustable -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Calificación Final (Ajustable):</label>
                     <select id="pointStatus" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
@@ -235,7 +235,7 @@
                     </select>
                 </div>
 
-                <!-- Direct Photo Capture / Upload -->
+                <!-- Subir Foto -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Fotografía del Lugar:</label>
                     <div class="flex items-center space-x-3">
@@ -250,7 +250,7 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
+                <!-- Botón de Envío -->
                 <div class="pt-4">
                     <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -261,7 +261,7 @@
         </div>
     </div>
 
-    <!-- Modal: Delete Points Authentication -->
+    <!-- Modal: Autenticación para Borrar Puntos -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -299,7 +299,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Lógica de JavaScript -->
     <script>
         const defaultPoints = [
             {
@@ -520,7 +520,7 @@
                 return `
                     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between">
                         <div>
-                            <!-- Photo Header -->
+                            <!-- Cabecera con Foto -->
                             <div class="h-44 w-full relative overflow-hidden bg-zinc-900">
                                 <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover">
                                 <div class="absolute top-3 left-3 bg-black/70 backdrop-blur border border-zinc-800 px-3 py-1 rounded-xl text-xs font-bold text-white">
@@ -531,11 +531,11 @@
                                 </div>
                             </div>
 
-                            <!-- Content Body -->
+                            <!-- Cuerpo de la Tarjeta -->
                             <div class="p-5 space-y-4">
                                 <h4 class="text-base font-bold text-white">${p.name}</h4>
                                 
-                                <!-- Signal Meter Bar -->
+                                <!-- Barra de Intensidad -->
                                 <div class="space-y-1.5">
                                     <div class="flex justify-between text-xs">
                                         <span class="text-zinc-400">Intensidad de Señal</span>
@@ -548,7 +548,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Footer -->
+                        <!-- Pie de la Tarjeta -->
                         <div class="px-5 py-3 bg-zinc-900/50 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-500">
                             <span><i class="fa-regular fa-clock mr-1"></i> ${p.date}</span>
                             <span class="text-zinc-400 font-medium">SearchConnect Verified</span>
