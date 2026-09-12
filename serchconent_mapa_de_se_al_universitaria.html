@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SerchConent - Red de Señal Universitaria</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        /* Radioactive green glowing button effect */
+        .btn-radioactive {
+            background-color: #00FF66;
+            color: #000000;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+        .btn-radioactive:hover {
+            background-color: #00cc52;
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
+            transform: translateY(-1px);
+        }
+        .border-radioactive {
+            border-color: #00FF66;
+        }
+        .text-radioactive {
+            color: #00FF66;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00FF66;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-[#00FF66] selection:text-black">
+
+    <header class="border-b border-zinc-800 bg-black/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center text-[#00FF66] shadow-[0_0_10px_rgba(0,255,102,0.3)]">
+                    <i class="fa-solid fa-wifi text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wider text-white">Serch<span class="text-radioactive">Conent</span></h1>
+                    <p class="text-xs text-zinc-400">Puntos de señal óptima en la universidad</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button onclick="openModal()" class="btn-radioactive px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-plus"></i> Registrar Punto
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 flex flex-col gap-8">
+
+        <!-- Stats Overview Banner -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-radioactive text-xl">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-zinc-400 uppercase font-semibold">Puntos Registrados</p>
+                    <h3 id="total-count" class="text-2xl font-bold text-white">0</h3>
+                </div>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-radioactive text-xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-zinc-400 uppercase font-semibold">Puntos Buenos</p>
+                    <h3 id="good-count" class="text-2xl font-bold text-white">0</h3>
+                </div>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-radioactive text-xl">
+                    <i class="fa-solid fa-signal"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-zinc-400 uppercase font-semibold">Estado de Red</p>
+                    <h3 class="text-2xl font-bold text-radioactive flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-[#00FF66] animate-pulse inline-block"></span> En Línea
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search Toolbar -->
+        <div class="flex flex-col gap-4 bg-zinc-950 border border-zinc-800 p-4 md:p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div class="relative w-full md:w-96">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="search-input" oninput="filterPoints()" placeholder="Buscar por nombre o detalle..." 
+                        class="w-full bg-zinc-900 border border-zinc-800 text-white pl-11 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-[#00FF66] transition">
+                </div>
+                <!-- Signal Quality Filters -->
+                <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                    <span class="text-xs text-zinc-500 uppercase font-semibold mr-1">Calidad:</span>
+                    <button onclick="setFilter('todos')" id="filter-todos" class="filter-btn px-3 py-2 rounded-xl text-xs font-bold bg-[#00FF66] text-black transition whitespace-nowrap">Todos</button>
+                    <button onclick="setFilter('buena')" id="filter-buena" class="filter-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition whitespace-nowrap">Buena</button>
+                    <button onclick="setFilter('regular')" id="filter-regular" class="filter-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition whitespace-nowrap">Regular</button>
+                    <button onclick="setFilter('mala')" id="filter-mala" class="filter-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition whitespace-nowrap">Mala</button>
+                </div>
+            </div>
+
+            <!-- Quick Building & Floor Filter Buttons -->
+            <div class="pt-3 border-t border-zinc-900 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs text-zinc-500 uppercase font-semibold mr-1">Edificio:</span>
+                    <button onclick="setBuildingFilter('todos')" id="bldg-todos" class="bldg-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-[#00FF66] text-black transition">Todos A-B-C</button>
+                    <button onclick="setBuildingFilter('Edificio A')" id="bldg-Edificio A" class="bldg-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition">Edificio A</button>
+                    <button onclick="setBuildingFilter('Edificio B')" id="bldg-Edificio B" class="bldg-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition">Edificio B</button>
+                    <button onclick="setBuildingFilter('Edificio C')" id="bldg-Edificio C" class="bldg-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition">Edificio C</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-zinc-500 uppercase font-semibold">Piso:</span>
+                    <select id="floor-select" onchange="setFloorFilter(this.value)" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#00FF66] transition">
+                        <option value="todos">Todos los pisos (1-6)</option>
+                        <option value="Piso 1">Piso 1</option>
+                        <option value="Piso 2">Piso 2</option>
+                        <option value="Piso 3">Piso 3</option>
+                        <option value="Piso 4">Piso 4</option>
+                        <option value="Piso 5">Piso 5</option>
+                        <option value="Piso 6">Piso 6</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signal Points Container / Grid -->
+        <div id="points-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamically injected signal points will appear here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 text-2xl mb-4">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">No hay puntos de señal registrados</h3>
+            <p class="text-sm text-zinc-400 max-w-sm mb-6">Sé el primero en compartir la cobertura de internet en tu universidad para ayudar a los demás.</p>
+            <button onclick="openModal()" class="btn-radioactive px-5 py-2.5 rounded-xl text-sm">Registrar el primer punto</button>
+        </div>
+
+    </main>
+
+    <div id="point-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-zinc-950 border border-zinc-800 w-full max-w-lg rounded-3xl p-6 md:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 my-8">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-zinc-400 hover:text-white transition w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center text-[#00FF66]">
+                    <i class="fa-solid fa-tower-cell"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Nuevo Punto de Señal</h2>
+                    <p class="text-xs text-zinc-400">Comparte la calidad de conexión con la comunidad</p>
+                </div>
+            </div>
+
+            <form id="point-form" onsubmit="submitPoint(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Nombre del Lugar / Ubicación específica</label>
+                    <input type="text" id="input-nombre" required placeholder="Ej. Cafetería Central, Aula Magna, Pasillo..." 
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Edificio</label>
+                        <select id="input-edificio" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition">
+                            <option value="Edificio A">Edificio A</option>
+                            <option value="Edificio B">Edificio B</option>
+                            <option value="Edificio C">Edificio C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Piso</label>
+                        <select id="input-piso" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition">
+                            <option value="Piso 1">Piso 1</option>
+                            <option value="Piso 2">Piso 2</option>
+                            <option value="Piso 3">Piso 3</option>
+                            <option value="Piso 4">Piso 4</option>
+                            <option value="Piso 5">Piso 5</option>
+                            <option value="Piso 6">Piso 6</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Calidad de Señal</label>
+                            <button type="button" onclick="detectSignalAutomatically()" class="text-[10px] text-[#00FF66] hover:underline flex items-center gap-1 font-semibold">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-detectar
+                            </button>
+                        </div>
+                        <select id="input-senal" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition">
+                            <option value="buena">Buena (Excelente)</option>
+                            <option value="regular">Regular (Intermitente)</option>
+                            <option value="mala">Mala (Sin señal)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Velocidad Aprox / Red</label>
+                        <input type="text" id="input-velocidad" placeholder="Ej. 45 Mbps o 4G/5G" 
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition">
+                    </div>
+                </div>
+
+                <!-- Auto-detection info banner -->
+                <div id="auto-detection-banner" class="hidden bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-zinc-300 flex items-center justify-between">
+                    <span id="auto-detection-text" class="flex items-center gap-2">
+                        <i class="fa-solid fa-tower-broadcast text-[#00FF66]"></i> Auto-detección activada
+                    </span>
+                    <span class="text-[10px] text-zinc-500 font-mono" id="connection-details-debug"></span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Subir Foto del Lugar</label>
+                    <div class="flex items-center gap-3">
+                        <label class="flex-1 cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#00FF66] rounded-xl px-4 py-3 text-sm text-zinc-300 flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-camera text-[#00FF66]"></i>
+                            <span id="file-label-text">Seleccionar foto de galería / cámara</span>
+                            <input type="file" id="input-foto-file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                        </label>
+                        <button type="button" id="remove-image-btn" onclick="clearSelectedImage()" class="hidden bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-3 rounded-xl text-sm transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <!-- Image Preview Box -->
+                    <div id="image-preview-container" class="hidden mt-3 relative h-36 rounded-xl border border-zinc-800 overflow-hidden bg-zinc-900">
+                        <img id="image-preview" src="" alt="Vista previa" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-[10px] text-zinc-500 mt-1">La imagen se guardará directamente en el punto compartido.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Comentario / Tips de Conexión</label>
+                    <textarea id="input-comentario" rows="2" placeholder="Ej. El Wi-Fi de la universidad va perfecto aquí, hay enchufes cerca..." 
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00FF66] transition"></textarea>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold py-3 rounded-xl text-sm transition">Cancelar</button>
+                    <button type="submit" class="flex-1 btn-radioactive py-3 rounded-xl text-sm">Guardar y Compartir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-zinc-900 border border-[#00FF66] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-32 transition-all duration-300 z-50">
+        <i class="fa-solid fa-circle-check text-[#00FF66] text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">¡Operación exitosa!</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment variables provided by runtime or fallback for static deployment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'serchconent-university-signal-net';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDummyKeyForGitHubPagesTemplateRefreshIfNeeded",
+            authDomain: "serchconent.firebaseapp.com",
+            projectId: "serchconent-uni",
+            storageBucket: "serchconent-uni.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123:web:abc"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
+
+        let db = null;
+        let auth = null;
+        let pointsList = [];
+        let currentFilter = 'todos';
+        let currentBuilding = 'todos';
+        let currentFloor = 'todos';
+        let compressedImageData = '';
+
+        // Handle image file selection & compression for direct storage
+        window.handleImageUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast("La imagen es muy pesada. Máximo 5MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const maxWidth = 800;
+                    const maxHeight = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    compressedImageData = canvas.toDataURL('image/jpeg', 0.7);
+
+                    document.getElementById('image-preview').src = compressedImageData;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    document.getElementById('remove-image-btn').classList.remove('hidden');
+                    document.getElementById('file-label-text').textContent = 'Foto cargada con éxito';
+                    showToast("¡Foto añadida correctamente!");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearSelectedImage = function() {
+            compressedImageData = '';
+            document.getElementById('input-foto-file').value = '';
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('remove-image-btn').classList.add('hidden');
+            document.getElementById('file-label-text').textContent = 'Seleccionar foto de galería / cámara';
+        };
+
+        // Auto-detect signal using navigator.connection API
+        window.detectSignalAutomatically = function() {
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const senalSelect = document.getElementById('input-senal');
+            const velocidadInput = document.getElementById('input-velocidad');
+            const banner = document.getElementById('auto-detection-banner');
+            const debugSpan = document.getElementById('connection-details-debug');
+
+            if (!conn) {
+                showToast("Tu navegador no soporta lectura directa de red. Selecciona manualmente.");
+                return;
+            }
+
+            const effectiveType = conn.effectiveType;
+            const downlink = conn.downlink;
+            const rtt = conn.rtt;
+
+            let calculatedSignal = 'buena';
+            let speedText = '';
+
+            if (effectiveType) {
+                speedText = effectiveType.toUpperCase();
+                if (downlink) {
+                    speedText += ` (~${downlink} Mbps)`;
+                }
+            } else if (downlink) {
+                speedText = `${downlink} Mbps`;
+            } else {
+                speedText = 'Red Universitaria';
+            }
+
+            if (effectiveType === 'slow-2g' || effectiveType === '2g' || (rtt && rtt > 350) || (downlink && downlink < 1.5)) {
+                calculatedSignal = 'mala';
+            } else if (effectiveType === '3g' || (rtt && rtt > 150) || (downlink && downlink < 5)) {
+                calculatedSignal = 'regular';
+            } else {
+                calculatedSignal = 'buena';
+            }
+
+            senalSelect.value = calculatedSignal;
+            velocidadInput.value = speedText;
+
+            banner.classList.remove('hidden');
+            debugSpan.textContent = `RTT: ${rtt || 'N/A'}ms | DL: ${downlink || 'N/A'}Mb/s`;
+            showToast(`¡Señal auto-detectada como ${calculatedSignal.toUpperCase()}!`);
+        };
+
+        window.openModal = function() {
+            document.getElementById('point-modal').classList.remove('hidden');
+            setTimeout(() => {
+                detectSignalAutomatically();
+            }, 300);
+        }
+
+        window.closeModal = function() {
+            document.getElementById('point-modal').classList.add('hidden');
+            document.getElementById('point-form').reset();
+            document.getElementById('auto-detection-banner').classList.add('hidden');
+            clearSelectedImage();
+        }
+
+        window.setFilter = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-[#00FF66]', 'text-black');
+                btn.classList.add('bg-zinc-900', 'text-zinc-300');
+            });
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-zinc-900', 'text-zinc-300');
+                activeBtn.classList.add('bg-[#00FF66]', 'text-black');
+            }
+            renderPoints();
+        }
+
+        window.setBuildingFilter = function(bldg) {
+            currentBuilding = bldg;
+            document.querySelectorAll('.bldg-btn').forEach(btn => {
+                btn.classList.remove('bg-[#00FF66]', 'text-black');
+                btn.classList.add('bg-zinc-900', 'text-zinc-300');
+            });
+            const activeBtn = document.getElementById(`bldg-${bldg}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-zinc-900', 'text-zinc-300');
+                activeBtn.classList.add('bg-[#00FF66]', 'text-black');
+            }
+            renderPoints();
+        }
+
+        window.setFloorFilter = function(floor) {
+            currentFloor = floor;
+            renderPoints();
+        }
+
+        window.filterPoints = function() {
+            renderPoints();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-32');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32');
+            }, 3500);
+        }
+
+        window.submitPoint = async function(event) {
+            event.preventDefault();
+            if (!db || !auth || !auth.currentUser) {
+                showToast("Conectando con el servidor compartido...");
+                return;
+            }
+
+            const nombre = document.getElementById('input-nombre').value.trim();
+            const edificio = document.getElementById('input-edificio').value;
+            const piso = document.getElementById('input-piso').value;
+            const senal = document.getElementById('input-senal').value;
+            const velocidad = document.getElementById('input-velocidad').value.trim() || 'No especificada';
+            const foto = compressedImageData || '';
+            const comentario = document.getElementById('input-comentario').value.trim() || 'Sin comentarios adicionales.';
+
+            const newPoint = {
+                nombre,
+                edificio,
+                piso,
+                senal,
+                velocidad,
+                foto,
+                comentario,
+                createdAt: Date.now(),
+                userId: auth.currentUser.uid
+            };
+
+            try {
+                const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'signal_points');
+                await addDoc(collectionRef, newPoint);
+                closeModal();
+                showToast("¡Punto de señal registrado y compartido!");
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showToast("Error al guardar el punto de señal.");
+            }
+        }
+
+        function renderPoints() {
+            const container = document.getElementById('points-container');
+            const emptyState = document.getElementById('empty-state');
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = pointsList.filter(p => {
+                const matchesFilter = currentFilter === 'todos' || p.senal === currentFilter;
+                const matchesBuilding = currentBuilding === 'todos' || p.edificio === currentBuilding;
+                const matchesFloor = currentFloor === 'todos' || p.piso === currentFloor;
+                const matchesSearch = p.nombre.toLowerCase().includes(searchVal) || 
+                                      p.edificio.toLowerCase().includes(searchVal) || 
+                                      p.piso.toLowerCase().includes(searchVal) ||
+                                      p.comentario.toLowerCase().includes(searchVal);
+                return matchesFilter && matchesBuilding && matchesFloor && matchesSearch;
+            });
+
+            document.getElementById('total-count').textContent = pointsList.length;
+            document.getElementById('good-count').textContent = pointsList.filter(p => p.senal === 'buena').length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = filtered.map(p => {
+                let badgeColor = '';
+                let badgeText = '';
+                let badgeIcon = '';
+                let signalBars = '';
+
+                if (p.senal === 'buena') {
+                    badgeColor = 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30';
+                    badgeText = 'Señal Buena';
+                    badgeIcon = 'fa-solid fa-circle-check';
+                    signalBars = `
+                        <div class="flex items-end gap-1 h-4" title="Señal Buena">
+                            <span class="w-1.5 h-2 bg-[#00FF66] rounded-sm"></span>
+                            <span class="w-1.5 h-3 bg-[#00FF66] rounded-sm"></span>
+                            <span class="w-1.5 h-4 bg-[#00FF66] rounded-sm"></span>
+                        </div>
+                    `;
+                } else if (p.senal === 'regular') {
+                    badgeColor = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
+                    badgeText = 'Señal Regular';
+                    badgeIcon = 'fa-solid fa-triangle-exclamation';
+                    signalBars = `
+                        <div class="flex items-end gap-1 h-4" title="Señal Regular">
+                            <span class="w-1.5 h-2 bg-yellow-400 rounded-sm"></span>
+                            <span class="w-1.5 h-3 bg-yellow-400 rounded-sm"></span>
+                            <span class="w-1.5 h-4 bg-zinc-800 rounded-sm"></span>
+                        </div>
+                    `;
+                } else {
+                    badgeColor = 'bg-red-500/10 text-red-400 border-red-500/30';
+                    badgeText = 'Señal Mala';
+                    badgeIcon = 'fa-solid fa-circle-xmark';
+                    signalBars = `
+                        <div class="flex items-end gap-1 h-4" title="Señal Mala">
+                            <span class="w-1.5 h-2 bg-red-400 rounded-sm"></span>
+                            <span class="w-1.5 h-3 bg-zinc-800 rounded-sm"></span>
+                            <span class="w-1.5 h-4 bg-zinc-800 rounded-sm"></span>
+                        </div>
+                    `;
+                }
+
+                const photoSection = p.foto ? `
+                    <div class="mb-4 overflow-hidden rounded-2xl border border-zinc-800 h-40 bg-zinc-900">
+                        <img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nombre)}" class="w-full h-full object-cover hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://placehold.co/600x400/111111/00FF66?text=Foto+No+Disponible';">
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,102,0.1)] group">
+                        <div>
+                            <div class="flex justify-between items-start gap-4 mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${badgeColor}">
+                                    <i class="${badgeIcon}"></i> ${badgeText}
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    ${signalBars}
+                                    <span class="text-xs font-mono text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800">
+                                        <i class="fa-solid fa-gauge-high mr-1 text-[#00FF66]"></i> ${escapeHtml(p.velocidad)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-[#00FF66] transition">
+                                ${escapeHtml(p.nombre)}
+                            </h3>
+
+                            <div class="space-y-1.5 mb-4">
+                                <p class="text-sm text-zinc-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-building text-zinc-500 w-4"></i> 
+                                    <span class="font-medium">Edificio:</span> <span class="text-[#00FF66] font-semibold">${escapeHtml(p.edificio)}</span>
+                                </p>
+                                <p class="text-sm text-zinc-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-layer-group text-zinc-500 w-4"></i> 
+                                    <span class="font-medium">Piso:</span> <span class="text-[#00FF66] font-semibold">${escapeHtml(p.piso)}</span>
+                                </p>
+                            </div>
+
+                            ${photoSection}
+
+                            <div class="bg-zinc-900/60 border border-zinc-900 rounded-2xl p-3 mb-2">
+                                <p class="text-xs text-zinc-400 italic">"${escapeHtml(p.comentario)}"</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-zinc-900 flex justify-between items-center text-xs text-zinc-500">
+                            <span>Compartido por la comunidad</span>
+                            <span>${new Date(p.createdAt).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#039;');
+        }
+
+        window.onload = async function() {
+            if (!firebaseConfig) return;
+
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'signal_points'));
+                onSnapshot(q, (snapshot) => {
+                    pointsList = [];
+                    snapshot.forEach((doc) => {
+                        pointsList.push({ id: doc.id, ...doc.data() });
+                    });
+                    pointsList.sort((a, b) => b.createdAt - a.createdAt);
+                    renderPoints();
+                }, (error) => {
+                    console.error("Firestore snapshot error: ", error);
+                });
+
+            } catch (e) {
+                console.error("Authentication or connection error: ", e);
+            }
+        }
+    </script>
+</body>
+</html>
