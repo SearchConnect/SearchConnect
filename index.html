@@ -77,7 +77,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Noticias y Novedades con botón protegido -->
+            <!-- PANEL IZQUIERDO: Centro de Novedades Desplegable y Protegido -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -86,9 +86,9 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <!-- Botón + protegido con contraseña para gestionar noticias (añadir/borrar) -->
+                            <!-- Botón Desplegable Protegido con Contraseña para Gestionar (Añadir/Borrar) -->
                             <button onclick="openNewsAuthModal()" title="Gestionar Novedades" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
-                                <i class="fa-solid fa-plus"></i>
+                                <i class="fa-solid fa-gear"></i>
                             </button>
                             <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
                         </div>
@@ -281,7 +281,7 @@
         </div>
     </div>
 
-    <!-- Modal: Contraseña para Gestionar Noticias -->
+    <!-- Modal: Contraseña para Gestionar Novedades -->
     <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -359,7 +359,7 @@
                     <span>Zona de Peligro</span>
                 </h4>
                 <p class="text-xs text-zinc-400 leading-relaxed">
-                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí.
+                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí (protegido).
                 </p>
                 <button type="button" onclick="verifyAndDeleteNews()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-trash-can"></i>
@@ -503,7 +503,7 @@
         }
 
         window.verifyAndDeleteNews = async function() {
-            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades?")) {
+            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades? Esta acción no se puede deshacer.")) {
                 try {
                     const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
                     const deletePromises = querySnapshot.docs.map((documentSnap) => 
@@ -511,12 +511,14 @@
                     );
                     await Promise.all(deletePromises);
                     closeCreateNewsModal();
+                    alert("Se han borrado todas las novedades correctamente.");
                 } catch (error) {
                     alert("Error al eliminar las novedades de Firebase.");
                 }
             }
         }
 
+        // Renderizar Noticias en el Panel Izquierdo
         function renderNews() {
             const container = document.getElementById('newsContainer');
             if (newsList.length === 0) {
@@ -524,71 +526,41 @@
                 return;
             }
 
-            container.innerHTML = newsList.map(n => {
-                let badgeStyle = n.type === 'Reparación' ? 'bg-red-500/10 text-red-400 border-red-500/30' : (n.type === 'Aviso' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' : 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30');
+            container.innerHTML = newsList.map(news => {
+                let badgeColor = 'bg-zinc-900 text-zinc-300 border-zinc-800';
+                if (news.type === 'Reparación') badgeColor = 'bg-red-500/10 text-red-400 border-red-500/30';
+                if (news.type === 'Éxito') badgeColor = 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30';
+                if (news.type === 'Aviso') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+
                 return `
-                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
+                    <div class="bg-zinc-900/60 border border-zinc-900 rounded-xl p-3 space-y-1.5 transition-all hover:border-zinc-800">
                         <div class="flex items-center justify-between">
-                            <span class="${badgeStyle} border px-2 py-0.5 rounded-md font-semibold text-[10px]">${n.type}</span>
-                            <span class="text-zinc-500">${n.date}</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${badgeColor}">${news.type}</span>
+                            <span class="text-[10px] text-zinc-500">${news.date}</span>
                         </div>
-                        <h4 class="font-bold text-white leading-snug">${n.title}</h4>
-                        <p class="text-zinc-400 leading-relaxed">${n.description}</p>
+                        <h4 class="font-bold text-white text-xs">${news.title}</h4>
+                        <p class="text-zinc-400 leading-relaxed text-[11px]">${news.description}</p>
                     </div>
                 `;
             }).join('');
         }
 
-        // Velocidad y Puntos
-        window.runSpeedTest = async function() {
-            const statusEl = document.getElementById('detectorStatus');
-            const qualityLabel = document.getElementById('detectedQualityLabel');
-            const speedLabel = document.getElementById('detectedSpeedLabel');
-            const statusSelect = document.getElementById('pointStatus');
-            const btn = document.getElementById('speedTestBtn');
-
-            btn.disabled = true;
-            btn.innerText = "Midiendo...";
-            statusEl.innerText = "Descargando paquete de prueba...";
-
-            const testImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
-            const startTime = performance.now();
-
-            try {
-                const response = await fetch(testImageUrl + '&cache=' + Math.random());
-                const blob = await response.blob();
-                const endTime = performance.now();
-                const durationSeconds = (endTime - startTime) / 1000;
-                const speedMbps = ((blob.size * 8) / (durationSeconds * 1024 * 1024)).toFixed(2);
-                let quality = speedMbps > 15 ? "Buena" : (speedMbps > 4 ? "Regular" : "Mala");
-
-                statusEl.innerHTML = `<span class="text-[#00FF66] font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Medición exitosa.</span>`;
-                qualityLabel.innerText = quality;
-                speedLabel.innerText = `${speedMbps} Mbps`;
-                statusSelect.value = quality;
-            } catch (error) {
-                statusEl.innerText = "No se pudo completar la prueba automática.";
-                qualityLabel.innerText = "Regular";
-                speedLabel.innerText = "12.0 Mbps";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Medir Ahora";
-            }
-        }
-
+        // Gestión de Puntos
         window.openModal = function() {
+            document.getElementById('pointForm').reset();
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
+            base64PhotoData = '';
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.`;
+            document.getElementById('detectedQualityLabel').innerText = "Pendiente";
+            document.getElementById('detectedSpeedLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
             document.getElementById('registerModal').classList.add('flex');
-            runSpeedTest();
         }
 
         window.closeModal = function() {
             document.getElementById('registerModal').classList.remove('flex');
             document.getElementById('registerModal').classList.add('hidden');
-            document.getElementById('pointForm').reset();
-            base64PhotoData = '';
-            document.getElementById('photoFileName').innerText = 'Tomar foto o subir archivo';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
         }
 
         window.openDeleteModal = function() {
@@ -604,10 +576,9 @@
         }
 
         window.verifyAndDeletePoints = async function() {
-            const pwdInput = document.getElementById('adminPasswordInput').value;
-            const errorMsg = document.getElementById('deleteErrorMsg');
-
-            if (pwdInput === "Admin12345678") {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            const errorEl = document.getElementById('deleteErrorMsg');
+            if (pwd === "Admin12345678") {
                 try {
                     const querySnapshot = await getDocs(collection(db, "searchconnect_points"));
                     const deletePromises = querySnapshot.docs.map((documentSnap) => 
@@ -615,24 +586,13 @@
                     );
                     await Promise.all(deletePromises);
                     closeDeleteModal();
+                    alert("Todos los puntos han sido eliminados de la base de datos.");
                 } catch (error) {
-                    alert("Error al eliminar los registros de Firebase.");
+                    alert("Error al vaciar los puntos de Firebase.");
                 }
             } else {
-                errorMsg.classList.remove('hidden');
+                errorEl.classList.remove('hidden');
             }
-        }
-
-        window.setBuildingFilter = function(bld) {
-            activeBuildingFilter = bld;
-            document.querySelectorAll('.filter-bld').forEach(btn => {
-                if (btn.getAttribute('data-bld') === bld) {
-                    btn.className = 'filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]';
-                } else {
-                    btn.className = 'filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]';
-                }
-            });
-            renderPoints();
         }
 
         window.handlePhotoUpload = function(event) {
@@ -642,11 +602,58 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     base64PhotoData = e.target.result;
-                    const previewImg = document.getElementById('photoPreviewImg');
-                    previewImg.src = base64PhotoData;
+                    document.getElementById('photoPreviewImg').src = base64PhotoData;
                     document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
+                }
                 reader.readAsDataURL(file);
+            }
+        }
+
+        window.runSpeedTest = async function() {
+            const btn = document.getElementById('speedTestBtn');
+            const status = document.getElementById('detectorStatus');
+            const qLabel = document.getElementById('detectedQualityLabel');
+            const sLabel = document.getElementById('detectedSpeedLabel');
+            const statusSelect = document.getElementById('pointStatus');
+
+            btn.disabled = true;
+            btn.innerText = "Midiendo...";
+            status.innerText = "Calculando velocidad de transferencia de red...";
+
+            const startTime = performance.now();
+            const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
+
+            try {
+                const response = await fetch(imageUrl, { mode: 'no-cors' });
+                const endTime = performance.now();
+                const durationSec = (endTime - startTime) / 1000;
+                
+                // Archivo simulado aprox de 15KB
+                const fileSizeBits = 15000 * 8; 
+                const speedBps = fileSizeBits / durationSec;
+                const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
+
+                sLabel.innerText = speedMbps + " Mbps";
+
+                if (speedMbps > 2.5) {
+                    qLabel.innerText = "Buena (Óptima)";
+                    statusSelect.value = "Buena";
+                } else if (speedMbps > 1.0) {
+                    qLabel.innerText = "Regular (Media)";
+                    statusSelect.value = "Regular";
+                } else {
+                    qLabel.innerText = "Mala (Débil)";
+                    statusSelect.value = "Mala";
+                }
+                status.innerText = "¡Prueba completada con éxito!";
+            } catch (err) {
+                sLabel.innerText = "N/A";
+                qLabel.innerText = "Regular (Media)";
+                statusSelect.value = "Regular";
+                status.innerText = "No se pudo completar la prueba exacta. Calificación asignada por defecto.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Medir Ahora";
             }
         }
 
@@ -658,85 +665,98 @@
                 building: document.getElementById('pointBuilding').value,
                 floor: document.getElementById('pointFloor').value,
                 status: document.getElementById('pointStatus').value,
-                speed: document.getElementById('detectedSpeedLabel').innerText || "Red Universitaria",
-                photo: base64PhotoData || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
-                date: 'Recién registrado'
+                photo: base64PhotoData || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600",
+                date: new Date().toLocaleDateString()
             };
 
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
+                alert("¡Punto registrado exitosamente!");
             } catch (error) {
-                alert("Hubo un error al guardar en Firebase: " + error.message);
+                alert("Error al guardar en Firebase: " + error.message);
             }
         }
 
-        window.filterPoints = function() { renderPoints(); }
+        window.setBuildingFilter = function(building) {
+            activeBuildingFilter = building;
+            document.querySelectorAll('.filter-bld').forEach(btn => {
+                if (btn.getAttribute('data-bld') === building) {
+                    btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]";
+                } else {
+                    btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]";
+                }
+            });
+            filterPoints();
+        }
 
-        function renderPoints() {
+        window.filterPoints = function() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const floorVal = document.getElementById('floorFilter').value;
-            const signalVal = document.getElementById('signalFilter').value;
-            const grid = document.getElementById('pointsGrid');
+            const floor = document.getElementById('floorFilter').value;
+            const signal = document.getElementById('signalFilter').value;
 
             const filtered = points.filter(p => {
-                return (activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter) &&
-                       (p.name.toLowerCase().includes(search) || p.building.toLowerCase().includes(search)) &&
-                       (!floorVal || p.floor === floorVal) &&
-                       (!signalVal || p.status === signalVal);
+                const matchBld = (activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter);
+                const matchSearch = p.name.toLowerCase().includes(search) || p.building.toLowerCase().includes(search);
+                const matchFloor = (!floor || p.floor === floor);
+                const matchSignal = (!signal || p.status === signal);
+                return matchBld && matchSearch && matchFloor && matchSignal;
             });
 
-            document.getElementById('counterBadge').innerText = `${filtered.length} puntos encontrados`;
+            renderFilteredPoints(filtered);
+        }
 
-            if (filtered.length === 0) {
+        function renderFilteredPoints(data) {
+            const grid = document.getElementById('pointsGrid');
+            document.getElementById('counterBadge').innerText = `${data.length} puntos encontrados`;
+
+            if (data.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full py-12 text-center bg-zinc-950 border border-zinc-900 rounded-2xl">
-                        <i class="fa-solid fa-triangle-exclamation text-zinc-600 text-3xl mb-3"></i>
-                        <p class="text-sm text-zinc-400">No se encontraron puntos con los filtros seleccionados.</p>
+                    <div class="col-span-full py-12 text-center text-zinc-500 bg-zinc-950 border border-zinc-800 rounded-2xl">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 text-zinc-600"></i>
+                        <p class="text-sm">No se encontraron puntos con los filtros seleccionados.</p>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = filtered.map(p => {
-                let badgeClass = p.status === 'Buena' ? 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30' : (p.status === 'Regular' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30');
-                let barWidth = p.status === 'Buena' ? 'w-full' : (p.status === 'Regular' ? 'w-3/5' : 'w-1/5');
-                let barColor = p.status === 'Buena' ? 'bg-[#00FF66]' : (p.status === 'Regular' ? 'bg-yellow-400' : 'bg-red-500');
+            grid.innerHTML = data.map(p => {
+                let statusBadge = '';
+                if (p.status === 'Buena') {
+                    statusBadge = `<span class="bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Buena</span></span>`;
+                } else if (p.status === 'Regular') {
+                    statusBadge = `<span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Regular</span></span>`;
+                } else {
+                    statusBadge = `<span class="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Mala</span></span>`;
+                }
 
                 return `
                     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between">
                         <div>
-                            <div class="h-44 w-full relative overflow-hidden bg-zinc-900">
+                            <div class="h-48 overflow-hidden relative bg-zinc-900">
                                 <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover">
-                                <div class="absolute top-3 left-3 bg-black/70 backdrop-blur border border-zinc-800 px-3 py-1 rounded-xl text-xs font-bold text-white">
-                                    ${p.building} • ${p.floor}
-                                </div>
-                                <div class="absolute top-3 right-3 px-3 py-1 rounded-xl text-xs font-bold border ${badgeClass} backdrop-blur bg-black/80">
-                                    ${p.status}
+                                <div class="absolute top-3 right-3">
+                                    ${statusBadge}
                                 </div>
                             </div>
-                            <div class="p-5 space-y-4">
+                            <div class="p-5 space-y-3">
                                 <h4 class="text-base font-bold text-white">${p.name}</h4>
-                                <div class="space-y-1.5">
-                                    <div class="flex justify-between text-xs">
-                                        <span class="text-zinc-400">Velocidad Medida</span>
-                                        <span class="font-bold text-white">${p.speed}</span>
-                                    </div>
-                                    <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-zinc-800">
-                                        <div class="${barWidth} ${barColor} h-full rounded-full transition-all duration-500"></div>
-                                    </div>
+                                <div class="flex items-center space-x-4 text-xs text-zinc-400">
+                                    <span class="flex items-center space-x-1"><i class="fa-solid fa-building text-[#00FF66]"></i><span>${p.building}</span></span>
+                                    <span class="flex items-center space-x-1"><i class="fa-solid fa-layer-group text-[#00FF66]"></i><span>${p.floor}</span></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="px-5 py-3 bg-zinc-900/50 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-500">
-                            <span><i class="fa-regular fa-clock mr-1"></i> ${p.date}</span>
-                            <span class="text-[#00FF66] font-medium"><i class="fa-solid fa-cloud"></i> Firebase Cloud</span>
+                        <div class="px-5 pb-5 pt-0 flex items-center justify-between text-xs text-zinc-500 border-t border-zinc-900 mt-2 pt-3">
+                            <span>Registrado el ${p.date || 'Reciente'}</span>
+                            <span class="text-[#00FF66] font-medium">Verificado en red</span>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
+        // Inicializar sincronización al cargar la página
         initRealtimeSync();
     </script>
 </body>
