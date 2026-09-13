@@ -77,7 +77,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Centro de Novedades Desplegable y Protegido -->
+            <!-- PANEL IZQUIERDO: Centro de Novedades -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -86,7 +86,6 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <!-- Botón Desplegable Protegido con Contraseña para Gestionar (Añadir/Borrar) -->
                             <button onclick="openNewsAuthModal()" title="Gestionar Novedades" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
                                 <i class="fa-solid fa-gear"></i>
                             </button>
@@ -94,7 +93,6 @@
                         </div>
                     </div>
 
-                    <!-- Contenedor dinámico de noticias desde Firebase -->
                     <div id="newsContainer" class="space-y-4 text-xs">
                         <p class="text-zinc-500 text-center py-4">Cargando novedades...</p>
                     </div>
@@ -227,7 +225,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-gauge-high text-[#00FF66]"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal (iOS / Android)</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal</span>
                         </div>
                         <button type="button" onclick="runSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
                             Medir Ahora
@@ -312,7 +310,7 @@
         </div>
     </div>
 
-    <!-- Modal: Panel de Gestión de Novedades (Añadir / Borrar) -->
+    <!-- Modal: Panel de Gestión de Novedades -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -327,7 +325,6 @@
                 </button>
             </div>
 
-            <!-- Sección 1: Crear Nueva Noticia -->
             <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4 pb-4 border-b border-zinc-900">
                 <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Publicar Nuevo Aviso</h4>
                 <div class="space-y-1.5">
@@ -352,14 +349,13 @@
                 </button>
             </form>
 
-            <!-- Sección 2: Borrar todas las Novedades -->
             <div class="space-y-3 pt-2">
                 <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center space-x-1.5">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>Zona de Peligro</span>
                 </h4>
                 <p class="text-xs text-zinc-400 leading-relaxed">
-                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí (protegido).
+                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí.
                 </p>
                 <button type="button" onclick="verifyAndDeleteNews()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-trash-can"></i>
@@ -404,7 +400,7 @@
     <!-- Lógica de Firebase Firestore y Funcionalidades -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBaXSYkQpqeuTxmz3f1hKjMlSHF6YQBHbY",
@@ -424,35 +420,37 @@
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
 
-        // Sincronización en tiempo real (Puntos y Noticias)
+        // Sincronización en tiempo real segura (sin requerir índices complejos previos)
         function initRealtimeSync() {
             // Sincronizar Puntos
-            const qPoints = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
-            onSnapshot(qPoints, (snapshot) => {
+            onSnapshot(collection(db, "searchconnect_points"), (snapshot) => {
                 points = [];
                 snapshot.forEach((docSnap) => {
                     points.push({ firebaseId: docSnap.id, ...docSnap.data() });
                 });
+                // Ordenar del más reciente al más antiguo en memoria
+                points.sort((a, b) => b.id - a.id);
                 document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
-                renderPoints();
+                filterPoints();
             }, (error) => {
-                console.error("Error de puntos: ", error);
+                console.error("Error al sincronizar puntos: ", error);
+                document.getElementById('syncStatus').innerText = "Error de Sincronización";
             });
 
             // Sincronizar Noticias
-            const qNews = query(collection(db, "searchconnect_news"), orderBy("id", "desc"));
-            onSnapshot(qNews, (snapshot) => {
+            onSnapshot(collection(db, "searchconnect_news"), (snapshot) => {
                 newsList = [];
                 snapshot.forEach((docSnap) => {
                     newsList.push({ firebaseId: docSnap.id, ...docSnap.data() });
                 });
+                newsList.sort((a, b) => b.id - a.id);
                 renderNews();
             }, (error) => {
-                console.error("Error de noticias: ", error);
+                console.error("Error al sincronizar noticias: ", error);
             });
         }
 
-        // Funciones de Modales para Noticias
+        // Modales de Autenticación y Gestión de Noticias
         window.openNewsAuthModal = function() {
             document.getElementById('newsAuthPassword').value = '';
             document.getElementById('newsAuthError').classList.add('hidden');
@@ -496,14 +494,15 @@
             try {
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
                 document.getElementById('newsForm').reset();
+                closeCreateNewsModal();
                 alert("¡Noticia publicada con éxito!");
             } catch (error) {
-                alert("Error al publicar la noticia en Firebase: " + error.message);
+                alert("Error al publicar la noticia: " + error.message);
             }
         }
 
         window.verifyAndDeleteNews = async function() {
-            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades? Esta acción no se puede deshacer.")) {
+            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades?")) {
                 try {
                     const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
                     const deletePromises = querySnapshot.docs.map((documentSnap) => 
@@ -513,12 +512,11 @@
                     closeCreateNewsModal();
                     alert("Se han borrado todas las novedades correctamente.");
                 } catch (error) {
-                    alert("Error al eliminar las novedades de Firebase.");
+                    alert("Error al eliminar las novedades: " + error.message);
                 }
             }
         }
 
-        // Renderizar Noticias en el Panel Izquierdo
         function renderNews() {
             const container = document.getElementById('newsContainer');
             if (newsList.length === 0) {
@@ -545,13 +543,13 @@
             }).join('');
         }
 
-        // Gestión de Puntos
+        // Gestión y Guardado de Puntos
         window.openModal = function() {
             document.getElementById('pointForm').reset();
             document.getElementById('photoPreviewContainer').classList.add('hidden');
             document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
             base64PhotoData = '';
-            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.`;
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real.`;
             document.getElementById('detectedQualityLabel').innerText = "Pendiente";
             document.getElementById('detectedSpeedLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
@@ -588,7 +586,7 @@
                     closeDeleteModal();
                     alert("Todos los puntos han sido eliminados de la base de datos.");
                 } catch (error) {
-                    alert("Error al vaciar los puntos de Firebase.");
+                    alert("Error al vaciar los puntos: " + error.message);
                 }
             } else {
                 errorEl.classList.remove('hidden');
@@ -618,7 +616,7 @@
 
             btn.disabled = true;
             btn.innerText = "Midiendo...";
-            status.innerText = "Calculando velocidad de transferencia de red...";
+            status.innerText = "Calculando velocidad de transferencia...";
 
             const startTime = performance.now();
             const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
@@ -627,8 +625,6 @@
                 const response = await fetch(imageUrl, { mode: 'no-cors' });
                 const endTime = performance.now();
                 const durationSec = (endTime - startTime) / 1000;
-                
-                // Archivo simulado aprox de 15KB
                 const fileSizeBits = 15000 * 8; 
                 const speedBps = fileSizeBits / durationSec;
                 const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
@@ -650,7 +646,7 @@
                 sLabel.innerText = "N/A";
                 qLabel.innerText = "Regular (Media)";
                 statusSelect.value = "Regular";
-                status.innerText = "No se pudo completar la prueba exacta. Calificación asignada por defecto.";
+                status.innerText = "Calificación asignada por defecto.";
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Medir Ahora";
@@ -672,9 +668,10 @@
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
-                alert("¡Punto registrado exitosamente!");
+                alert("¡Punto registrado y guardado en Firebase exitosamente!");
             } catch (error) {
-                alert("Error al guardar en Firebase: " + error.message);
+                console.error("Error detallado al guardar:", error);
+                alert("Error al guardar en Firebase: " + error.message + "\n\n(Verifica si tus reglas de Firestore permiten escritura pública).");
             }
         }
 
@@ -756,7 +753,7 @@
             }).join('');
         }
 
-        // Inicializar sincronización al cargar la página
+        // Inicializar sincronización en tiempo real
         initRealtimeSync();
     </script>
 </body>
