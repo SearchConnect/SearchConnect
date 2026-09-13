@@ -77,7 +77,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Centro de Novedades -->
+            <!-- PANEL IZQUIERDO: Noticias y Novedades con botones protegidos -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -86,13 +86,18 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="openNewsAuthModal()" title="Gestionar Novedades" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
-                                <i class="fa-solid fa-gear"></i>
+                            <!-- Botón + protegido con contraseña para agregar noticias -->
+                            <button onclick="openNewsAuthModal('create')" title="Publicar Nueva Noticia" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
+                                <i class="fa-solid fa-plus"></i>
                             </button>
-                            <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
+                            <!-- Botón Basura protegido para borrar noticias -->
+                            <button onclick="openNewsAuthModal('delete')" title="Gestionar / Borrar Novedades" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all text-xs font-bold">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
                         </div>
                     </div>
 
+                    <!-- Contenedor dinámico de noticias desde Firebase -->
                     <div id="newsContainer" class="space-y-4 text-xs">
                         <p class="text-zinc-500 text-center py-4">Cargando novedades...</p>
                     </div>
@@ -225,7 +230,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-gauge-high text-[#00FF66]"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal (iOS / Android)</span>
                         </div>
                         <button type="button" onclick="runSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
                             Medir Ahora
@@ -279,7 +284,7 @@
         </div>
     </div>
 
-    <!-- Modal: Contraseña para Gestionar Novedades -->
+    <!-- Modal: Contraseña para Gestión de Noticias -->
     <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -287,15 +292,15 @@
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center">
                         <i class="fa-solid fa-shield-halved text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Acceso Restringido</h3>
+                    <h3 id="newsAuthTitle" class="text-base font-bold text-white">Acceso Restringido</h3>
                 </div>
                 <button onclick="closeNewsAuthModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <div class="space-y-4">
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para añadir o borrar novedades en la red.
+                <p id="newsAuthDesc" class="text-xs text-zinc-400 leading-relaxed">
+                    Introduce la contraseña de administrador para continuar.
                 </p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
@@ -310,25 +315,23 @@
         </div>
     </div>
 
-    <!-- Modal: Panel de Gestión de Novedades -->
+    <!-- Modal: Formulario para Crear Nueva Noticia -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
                         <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Gestión de Novedades</h3>
+                    <h3 class="text-base font-bold text-white">Publicar Novedad o Reparación</h3>
                 </div>
                 <button onclick="closeCreateNewsModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-
-            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4 pb-4 border-b border-zinc-900">
-                <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Publicar Nuevo Aviso</h4>
+            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-400">Tipo de Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Tipo de Aviso:</label>
                     <select id="newsType" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="Reparación">Reparación</option>
                         <option value="Aviso">Aviso</option>
@@ -336,31 +339,40 @@
                     </select>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-400">Título del Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Título del Aviso:</label>
                     <input type="text" id="newsTitle" required placeholder="Ej: Mantenimiento Router Edificio B..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-400">Descripción detallada:</label>
-                    <textarea id="newsDescription" required rows="2" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Descripción detallada:</label>
+                    <textarea id="newsDescription" required rows="3" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
                 </div>
-                <button type="submit" class="w-full btn-radioactive py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Publicar en la Red</span>
-                </button>
+                <div class="pt-2">
+                    <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Publicar en la Red</span>
+                    </button>
+                </div>
             </form>
+        </div>
+    </div>
 
-            <div class="space-y-3 pt-2">
-                <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center space-x-1.5">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span>Zona de Peligro</span>
-                </h4>
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí.
-                </p>
-                <button type="button" onclick="verifyAndDeleteNews()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>Borrar Todas las Novedades</span>
+    <!-- Modal: Listado y Gestión para Borrar Novedades -->
+    <div id="deleteNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-trash-can text-red-400 text-sm"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Gestionar y Borrar Novedades</h3>
+                </div>
+                <button onclick="closeDeleteNewsModal()" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
+            </div>
+            <p class="text-xs text-zinc-400">Selecciona la novedad que deseas eliminar permanentemente de la red:</p>
+            <div id="deleteNewsListContainer" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                <!-- Se llenará de forma dinámica -->
             </div>
         </div>
     </div>
@@ -382,7 +394,7 @@
 
             <div class="space-y-4">
                 <p class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para restablecer la base de datos de puntos globales.
+                    Introduce la contraseña de administrador para restablecer la base de datos global.
                 </p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
@@ -400,7 +412,7 @@
     <!-- Lógica de Firebase Firestore y Funcionalidades -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBaXSYkQpqeuTxmz3f1hKjMlSHF6YQBHbY",
@@ -419,41 +431,56 @@
         let newsList = [];
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
+        let newsAuthMode = 'create'; // 'create' o 'delete'
 
-        // Sincronización en tiempo real segura (sin requerir índices complejos previos)
+        // Sincronización en tiempo real (Puntos y Noticias)
         function initRealtimeSync() {
             // Sincronizar Puntos
-            onSnapshot(collection(db, "searchconnect_points"), (snapshot) => {
+            const qPoints = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
+            onSnapshot(qPoints, (snapshot) => {
                 points = [];
                 snapshot.forEach((docSnap) => {
                     points.push({ firebaseId: docSnap.id, ...docSnap.data() });
                 });
-                // Ordenar del más reciente al más antiguo en memoria
-                points.sort((a, b) => b.id - a.id);
                 document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
-                filterPoints();
+                renderPoints();
             }, (error) => {
-                console.error("Error al sincronizar puntos: ", error);
-                document.getElementById('syncStatus').innerText = "Error de Sincronización";
+                console.error("Error de puntos: ", error);
             });
 
             // Sincronizar Noticias
-            onSnapshot(collection(db, "searchconnect_news"), (snapshot) => {
+            const qNews = query(collection(db, "searchconnect_news"), orderBy("id", "desc"));
+            onSnapshot(qNews, (snapshot) => {
                 newsList = [];
                 snapshot.forEach((docSnap) => {
                     newsList.push({ firebaseId: docSnap.id, ...docSnap.data() });
                 });
-                newsList.sort((a, b) => b.id - a.id);
                 renderNews();
+                if(!document.getElementById('deleteNewsModal').classList.contains('hidden')) {
+                    renderDeleteNewsList();
+                }
             }, (error) => {
-                console.error("Error al sincronizar noticias: ", error);
+                console.error("Error de noticias: ", error);
             });
         }
 
-        // Modales de Autenticación y Gestión de Noticias
-        window.openNewsAuthModal = function() {
+        // Funciones de Modales para Noticias con Protección de Contraseña
+        window.openNewsAuthModal = function(mode) {
+            newsAuthMode = mode;
             document.getElementById('newsAuthPassword').value = '';
             document.getElementById('newsAuthError').classList.add('hidden');
+            
+            const titleEl = document.getElementById('newsAuthTitle');
+            const descEl = document.getElementById('newsAuthDesc');
+            
+            if (mode === 'create') {
+                titleEl.innerText = "Acceso Restringido (Publicar)";
+                descEl.innerText = "Introduce la contraseña de administrador para publicar una nueva novedad o aviso de reparación.";
+            } else {
+                titleEl.innerText = "Acceso Restringido (Borrar)";
+                descEl.innerText = "Introduce la contraseña de administrador para gestionar y borrar novedades de la red.";
+            }
+
             document.getElementById('newsAuthModal').classList.remove('hidden');
             document.getElementById('newsAuthModal').classList.add('flex');
         }
@@ -468,9 +495,15 @@
             const errorEl = document.getElementById('newsAuthError');
             if (pwd === "Admin12345678") {
                 closeNewsAuthModal();
-                document.getElementById('newsForm').reset();
-                document.getElementById('createNewsModal').classList.remove('hidden');
-                document.getElementById('createNewsModal').classList.add('flex');
+                if (newsAuthMode === 'create') {
+                    document.getElementById('newsForm').reset();
+                    document.getElementById('createNewsModal').classList.remove('hidden');
+                    document.getElementById('createNewsModal').classList.add('flex');
+                } else {
+                    renderDeleteNewsList();
+                    document.getElementById('deleteNewsModal').classList.remove('hidden');
+                    document.getElementById('deleteNewsModal').classList.add('flex');
+                }
             } else {
                 errorEl.classList.remove('hidden');
             }
@@ -479,6 +512,11 @@
         window.closeCreateNewsModal = function() {
             document.getElementById('createNewsModal').classList.remove('flex');
             document.getElementById('createNewsModal').classList.add('hidden');
+        }
+
+        window.closeDeleteNewsModal = function() {
+            document.getElementById('deleteNewsModal').classList.remove('flex');
+            document.getElementById('deleteNewsModal').classList.add('hidden');
         }
 
         window.saveNews = async function(e) {
@@ -493,28 +531,41 @@
 
             try {
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
-                document.getElementById('newsForm').reset();
                 closeCreateNewsModal();
-                alert("¡Noticia publicada con éxito!");
             } catch (error) {
-                alert("Error al publicar la noticia: " + error.message);
+                alert("Error al publicar la noticia en Firebase: " + error.message);
             }
         }
 
-        window.verifyAndDeleteNews = async function() {
-            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades?")) {
+        window.deleteNewsItem = async function(firebaseId) {
+            if (confirm("¿Estás seguro de eliminar esta novedad permanentemente?")) {
                 try {
-                    const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
-                    const deletePromises = querySnapshot.docs.map((documentSnap) => 
-                        deleteDoc(doc(db, "searchconnect_news", documentSnap.id))
-                    );
-                    await Promise.all(deletePromises);
-                    closeCreateNewsModal();
-                    alert("Se han borrado todas las novedades correctamente.");
+                    await deleteDoc(doc(db, "searchconnect_news", firebaseId));
                 } catch (error) {
-                    alert("Error al eliminar las novedades: " + error.message);
+                    alert("Error al eliminar la noticia: " + error.message);
                 }
             }
+        }
+
+        function renderDeleteNewsList() {
+            const container = document.getElementById('deleteNewsListContainer');
+            if (newsList.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-center py-4">No hay novedades para borrar.</p>`;
+                return;
+            }
+
+            container.innerHTML = newsList.map(n => `
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex items-center justify-between gap-3">
+                    <div class="space-y-1 overflow-hidden">
+                        <span class="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">${n.type}</span>
+                        <h4 class="font-bold text-white text-xs truncate">${n.title}</h4>
+                        <p class="text-[11px] text-zinc-400 truncate">${n.description}</p>
+                    </div>
+                    <button onclick="deleteNewsItem('${n.firebaseId}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 p-2.5 rounded-xl transition-all flex-shrink-0">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+            `).join('');
         }
 
         function renderNews() {
@@ -524,32 +575,89 @@
                 return;
             }
 
-            container.innerHTML = newsList.map(news => {
-                let badgeColor = 'bg-zinc-900 text-zinc-300 border-zinc-800';
-                if (news.type === 'Reparación') badgeColor = 'bg-red-500/10 text-red-400 border-red-500/30';
-                if (news.type === 'Éxito') badgeColor = 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30';
-                if (news.type === 'Aviso') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-
+            container.innerHTML = newsList.map(n => {
+                let badgeStyle = n.type === 'Reparación' ? 'bg-red-500/10 text-red-400 border-red-500/30' : (n.type === 'Aviso' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' : 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30');
                 return `
-                    <div class="bg-zinc-900/60 border border-zinc-900 rounded-xl p-3 space-y-1.5 transition-all hover:border-zinc-800">
+                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
                         <div class="flex items-center justify-between">
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${badgeColor}">${news.type}</span>
-                            <span class="text-[10px] text-zinc-500">${news.date}</span>
+                            <span class="${badgeStyle} border px-2 py-0.5 rounded-md font-semibold text-[10px]">${n.type}</span>
+                            <span class="text-zinc-500">${n.date}</span>
                         </div>
-                        <h4 class="font-bold text-white text-xs">${news.title}</h4>
-                        <p class="text-zinc-400 leading-relaxed text-[11px]">${news.description}</p>
+                        <h4 class="font-bold text-white leading-snug">${n.title}</h4>
+                        <p class="text-zinc-400 leading-relaxed">${n.description}</p>
                     </div>
                 `;
             }).join('');
         }
 
-        // Gestión y Guardado de Puntos
+        // Velocidad y Puntos
+        window.runSpeedTest = async function() {
+            const statusEl = document.getElementById('detectorStatus');
+            const qualityLabel = document.getElementById('detectedQualityLabel');
+            const speedLabel = document.getElementById('detectedSpeedLabel');
+            const statusSelect = document.getElementById('pointStatus');
+            const btn = document.getElementById('speedTestBtn');
+
+            btn.disabled = true;
+            btn.innerText = "Midiendo...";
+            statusEl.innerText = "Descargando paquete de prueba...";
+
+            const startTime = performance.now();
+            const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
+
+            try {
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const endTime = performance.now();
+                const durationSeconds = (endTime - startTime) / 1000;
+                const fileSizeBits = blob.size * 8;
+                const speedBps = fileSizeBits / durationSeconds;
+                const speedKbps = speedBps / 1024;
+                const speedMbps = (speedKbps / 1024).toFixed(2);
+
+                speedLabel.innerText = speedMbps + " Mbps";
+
+                let quality = "Mala";
+                if (speedMbps > 3.0) {
+                    quality = "Buena";
+                } else if (speedMbps > 1.0) {
+                    quality = "Regular";
+                }
+
+                qualityLabel.innerText = quality;
+                statusSelect.value = quality;
+                statusEl.innerText = "Prueba completada con éxito.";
+            } catch (err) {
+                speedLabel.innerText = "N/A";
+                qualityLabel.innerText = "Regular";
+                statusSelect.value = "Regular";
+                statusEl.innerText = "Medición estimada por restricciones de red.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Medir Ahora";
+            }
+        }
+
+        window.handlePhotoUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('photoFileName').innerText = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64PhotoData = e.target.result;
+                document.getElementById('photoPreviewImg').src = base64PhotoData;
+                document.getElementById('photoPreviewContainer').classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+
         window.openModal = function() {
             document.getElementById('pointForm').reset();
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-            document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
             base64PhotoData = '';
-            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real.`;
+            document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.`;
             document.getElementById('detectedQualityLabel').innerText = "Pendiente";
             document.getElementById('detectedSpeedLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
@@ -577,79 +685,17 @@
             const pwd = document.getElementById('adminPasswordInput').value;
             const errorEl = document.getElementById('deleteErrorMsg');
             if (pwd === "Admin12345678") {
+                closeDeleteModal();
                 try {
-                    const querySnapshot = await getDocs(collection(db, "searchconnect_points"));
-                    const deletePromises = querySnapshot.docs.map((documentSnap) => 
-                        deleteDoc(doc(db, "searchconnect_points", documentSnap.id))
-                    );
-                    await Promise.all(deletePromises);
-                    closeDeleteModal();
-                    alert("Todos los puntos han sido eliminados de la base de datos.");
+                    for (let p of points) {
+                        await deleteDoc(doc(db, "searchconnect_points", p.firebaseId));
+                    }
+                    alert("Todos los puntos han sido eliminados de la base de datos global.");
                 } catch (error) {
-                    alert("Error al vaciar los puntos: " + error.message);
+                    alert("Error al borrar puntos: " + error.message);
                 }
             } else {
                 errorEl.classList.remove('hidden');
-            }
-        }
-
-        window.handlePhotoUpload = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('photoFileName').innerText = file.name;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    base64PhotoData = e.target.result;
-                    document.getElementById('photoPreviewImg').src = base64PhotoData;
-                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        window.runSpeedTest = async function() {
-            const btn = document.getElementById('speedTestBtn');
-            const status = document.getElementById('detectorStatus');
-            const qLabel = document.getElementById('detectedQualityLabel');
-            const sLabel = document.getElementById('detectedSpeedLabel');
-            const statusSelect = document.getElementById('pointStatus');
-
-            btn.disabled = true;
-            btn.innerText = "Midiendo...";
-            status.innerText = "Calculando velocidad de transferencia...";
-
-            const startTime = performance.now();
-            const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
-
-            try {
-                const response = await fetch(imageUrl, { mode: 'no-cors' });
-                const endTime = performance.now();
-                const durationSec = (endTime - startTime) / 1000;
-                const fileSizeBits = 15000 * 8; 
-                const speedBps = fileSizeBits / durationSec;
-                const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
-
-                sLabel.innerText = speedMbps + " Mbps";
-
-                if (speedMbps > 2.5) {
-                    qLabel.innerText = "Buena (Óptima)";
-                    statusSelect.value = "Buena";
-                } else if (speedMbps > 1.0) {
-                    qLabel.innerText = "Regular (Media)";
-                    statusSelect.value = "Regular";
-                } else {
-                    qLabel.innerText = "Mala (Débil)";
-                    statusSelect.value = "Mala";
-                }
-                status.innerText = "¡Prueba completada con éxito!";
-            } catch (err) {
-                sLabel.innerText = "N/A";
-                qLabel.innerText = "Regular (Media)";
-                statusSelect.value = "Regular";
-                status.innerText = "Calificación asignada por defecto.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Medir Ahora";
             }
         }
 
@@ -661,24 +707,22 @@
                 building: document.getElementById('pointBuilding').value,
                 floor: document.getElementById('pointFloor').value,
                 status: document.getElementById('pointStatus').value,
-                photo: base64PhotoData || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600",
+                photo: base64PhotoData,
                 date: new Date().toLocaleDateString()
             };
 
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
-                alert("¡Punto registrado y guardado en Firebase exitosamente!");
             } catch (error) {
-                console.error("Error detallado al guardar:", error);
-                alert("Error al guardar en Firebase: " + error.message + "\n\n(Verifica si tus reglas de Firestore permiten escritura pública).");
+                alert("Error al guardar en Firebase: " + error.message);
             }
         }
 
-        window.setBuildingFilter = function(building) {
-            activeBuildingFilter = building;
+        window.setBuildingFilter = function(bld) {
+            activeBuildingFilter = bld;
             document.querySelectorAll('.filter-bld').forEach(btn => {
-                if (btn.getAttribute('data-bld') === building) {
+                if (btn.getAttribute('data-bld') === bld) {
                     btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]";
                 } else {
                     btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]";
@@ -688,72 +732,81 @@
         }
 
         window.filterPoints = function() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const floor = document.getElementById('floorFilter').value;
-            const signal = document.getElementById('signalFilter').value;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const floorVal = document.getElementById('floorFilter').value;
+            const signalVal = document.getElementById('signalFilter').value;
 
             const filtered = points.filter(p => {
-                const matchBld = (activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter);
-                const matchSearch = p.name.toLowerCase().includes(search) || p.building.toLowerCase().includes(search);
-                const matchFloor = (!floor || p.floor === floor);
-                const matchSignal = (!signal || p.status === signal);
-                return matchBld && matchSearch && matchFloor && matchSignal;
+                const matchesBuilding = (activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter);
+                const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.building.toLowerCase().includes(searchVal);
+                const matchesFloor = (!floorVal || p.floor === floorVal);
+                const matchesSignal = (!signalVal || p.status === signalVal);
+                return matchesBuilding && matchesSearch && matchesFloor && matchesSignal;
             });
 
-            renderFilteredPoints(filtered);
+            renderPointsGrid(filtered);
         }
 
-        function renderFilteredPoints(data) {
+        function renderPoints() {
+            filterPoints();
+        }
+
+        function renderPointsGrid(data) {
             const grid = document.getElementById('pointsGrid');
-            document.getElementById('counterBadge').innerText = `${data.length} puntos encontrados`;
+            const counter = document.getElementById('counterBadge');
+            counter.innerText = `${data.length} puntos encontrados`;
 
             if (data.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-zinc-500 bg-zinc-950 border border-zinc-800 rounded-2xl">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 text-zinc-600"></i>
-                        <p class="text-sm">No se encontraron puntos con los filtros seleccionados.</p>
+                    <div class="col-span-full py-12 text-center bg-zinc-950 border border-zinc-800 rounded-2xl space-y-3">
+                        <i class="fa-solid fa-signal-slash text-zinc-600 text-3xl"></i>
+                        <p class="text-zinc-400 text-sm">No se encontraron puntos de señal con los filtros seleccionados.</p>
                     </div>
                 `;
                 return;
             }
 
             grid.innerHTML = data.map(p => {
-                let statusBadge = '';
-                if (p.status === 'Buena') {
-                    statusBadge = `<span class="bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Buena</span></span>`;
-                } else if (p.status === 'Regular') {
-                    statusBadge = `<span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Regular</span></span>`;
-                } else {
-                    statusBadge = `<span class="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5"><i class="fa-solid fa-signal"></i><span>Mala</span></span>`;
+                let badgeClass = 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30';
+                let iconClass = 'fa-signal text-[#00FF66]';
+                if (p.status === 'Regular') {
+                    badgeClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
+                    iconClass = 'fa-signal text-yellow-400';
+                } else if (p.status === 'Mala') {
+                    badgeClass = 'bg-red-500/10 text-red-400 border-red-500/30';
+                    iconClass = 'fa-triangle-exclamation text-red-400';
                 }
 
                 return `
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between">
-                        <div>
-                            <div class="h-48 overflow-hidden relative bg-zinc-900">
-                                <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover">
-                                <div class="absolute top-3 right-3">
-                                    ${statusBadge}
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 hover:border-zinc-700 transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-bold text-white bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg">${p.building}</span>
+                                    <span class="text-xs text-zinc-400 bg-zinc-900/50 px-2 py-1 rounded-lg">${p.floor}</span>
                                 </div>
+                                <h4 class="text-base font-bold text-white pt-1">${p.name}</h4>
                             </div>
-                            <div class="p-5 space-y-3">
-                                <h4 class="text-base font-bold text-white">${p.name}</h4>
-                                <div class="flex items-center space-x-4 text-xs text-zinc-400">
-                                    <span class="flex items-center space-x-1"><i class="fa-solid fa-building text-[#00FF66]"></i><span>${p.building}</span></span>
-                                    <span class="flex items-center space-x-1"><i class="fa-solid fa-layer-group text-[#00FF66]"></i><span>${p.floor}</span></span>
-                                </div>
-                            </div>
+                            <span class="${badgeClass} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center space-x-1.5 flex-shrink-0">
+                                <i class="fa-solid ${iconClass}"></i>
+                                <span>${p.status}</span>
+                            </span>
                         </div>
-                        <div class="px-5 pb-5 pt-0 flex items-center justify-between text-xs text-zinc-500 border-t border-zinc-900 mt-2 pt-3">
-                            <span>Registrado el ${p.date || 'Reciente'}</span>
-                            <span class="text-[#00FF66] font-medium">Verificado en red</span>
+                        ${p.photo ? `
+                            <div class="w-full h-40 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden">
+                                <img src="${p.photo}" alt="Foto del punto" class="w-full h-full object-cover">
+                            </div>
+                        ` : ''}
+                        <div class="flex items-center justify-between text-xs text-zinc-500 pt-2 border-t border-zinc-900">
+                            <span>Registrado: ${p.date || 'Reciente'}</span>
+                            <span class="text-zinc-400 font-medium">SearchConnect Global</span>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Inicializar sincronización en tiempo real
+        // Inicializar sincronización al cargar la página
         initRealtimeSync();
     </script>
 </body>
