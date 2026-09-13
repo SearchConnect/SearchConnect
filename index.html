@@ -73,11 +73,11 @@
         </div>
     </header>
 
-    <!-- Contenido Principal con Distribución de Dos Columnas (Panel Izquierdo y Contenido Central) -->
+    <!-- Contenido Principal -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Noticias de Reparación y Novedades -->
+            <!-- PANEL IZQUIERDO: Noticias y Novedades con botón protegido -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -85,44 +85,23 @@
                             <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
-                        <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
+                        <div class="flex items-center space-x-2">
+                            <!-- Botón + protegido con contraseña para agregar noticias -->
+                            <button onclick="openNewsAuthModal()" title="Publicar Nueva Noticia" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
+                        </div>
                     </div>
 
-                    <div class="space-y-4 text-xs">
-                        <!-- Noticia 1 -->
-                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Reparación</span>
-                                <span class="text-zinc-500">Hoy</span>
-                            </div>
-                            <h4 class="font-bold text-white leading-snug">Mantenimiento Router Edificio B</h4>
-                            <p class="text-zinc-400 leading-relaxed">Personal técnico estará reparando el nodo principal del piso 3 de 2:00 PM a 4:00 PM.</p>
-                        </div>
-
-                        <!-- Noticia 2 -->
-                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Aviso</span>
-                                <span class="text-zinc-500">Ayer</span>
-                            </div>
-                            <h4 class="font-bold text-white leading-snug">Ampliación de Cobertura Edificio C</h4>
-                            <p class="text-zinc-400 leading-relaxed">Se han instalado 2 nuevos repetidores en el piso 5 para mejorar la señal móvil y Wi-Fi.</p>
-                        </div>
-
-                        <!-- Noticia 3 -->
-                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Éxito</span>
-                                <span class="text-zinc-500">Hace 3 días</span>
-                            </div>
-                            <h4 class="font-bold text-white leading-snug">Restauración Red Edificio A</h4>
-                            <p class="text-zinc-400 leading-relaxed">Finalizó con éxito el cambio de cableado de fibra óptica en el Auditorio Principal.</p>
-                        </div>
+                    <!-- Contenedor dinámico de noticias desde Firebase -->
+                    <div id="newsContainer" class="space-y-4 text-xs">
+                        <p class="text-zinc-500 text-center py-4">Cargando novedades...</p>
                     </div>
                 </div>
             </aside>
 
-            <!-- COLUMNA CENTRAL Y DERECHA: Mapa, Filtros y Cuadrícula de Puntos -->
+            <!-- COLUMNA CENTRAL Y DERECHA -->
             <div class="lg:col-span-3 space-y-8">
                 
                 <!-- Sección Hero y Filtros -->
@@ -132,7 +111,6 @@
                             <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo</h2>
                             <p class="text-sm text-zinc-400">Encuentra y comparte los mejores puntos de conexión en los edificios A, B y C (Pisos 1 al 6).</p>
                         </div>
-                        <!-- Indicador de Estado Global -->
                         <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
                             <span class="relative flex h-3 w-3">
                               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
@@ -303,6 +281,78 @@
         </div>
     </div>
 
+    <!-- Modal: Contraseña para Publicar Noticias -->
+    <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-[#00FF66] text-sm"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Acceso Restringido</h3>
+                </div>
+                <button onclick="closeNewsAuthModal()" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Introduce la contraseña de administrador para publicar una nueva novedad o aviso de reparación.
+                </p>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
+                    <input type="password" id="newsAuthPassword" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#00FF66]">
+                    <p id="newsAuthError" class="text-xs text-red-400 hidden pt-1">Contraseña incorrecta.</p>
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeNewsAuthModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
+                    <button type="button" onclick="verifyNewsPassword()" class="flex-1 btn-radioactive py-2.5 rounded-xl text-xs font-bold transition-all">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Formulario para Crear Nueva Noticia -->
+    <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
+                        <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Publicar Novedad o Reparación</h3>
+                </div>
+                <button onclick="closeCreateNewsModal()" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Tipo de Aviso:</label>
+                    <select id="newsType" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
+                        <option value="Reparación">Reparación</option>
+                        <option value="Aviso">Aviso</option>
+                        <option value="Éxito">Éxito / Mejora</option>
+                    </select>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Título del Aviso:</label>
+                    <input type="text" id="newsTitle" required placeholder="Ej: Mantenimiento Router Edificio B..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Descripción detallada:</label>
+                    <textarea id="newsDescription" required rows="3" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Publicar en la Red</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal: Autenticación para Borrar Puntos -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
@@ -328,12 +378,8 @@
                     <p id="deleteErrorMsg" class="text-xs text-red-400 hidden pt-1">Contraseña incorrecta.</p>
                 </div>
                 <div class="flex space-x-3 pt-2">
-                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="verifyAndDeletePoints()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">
-                        Borrar Todo
-                    </button>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
+                    <button type="button" onclick="verifyAndDeletePoints()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">Borrar Todo</button>
                 </div>
             </div>
         </div>
@@ -358,12 +404,15 @@
         const db = getFirestore(app);
 
         let points = [];
+        let newsList = [];
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
 
+        // Sincronización en tiempo real (Puntos y Noticias)
         function initRealtimeSync() {
-            const q = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
-            onSnapshot(q, (snapshot) => {
+            // Sincronizar Puntos
+            const qPoints = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
+            onSnapshot(qPoints, (snapshot) => {
                 points = [];
                 snapshot.forEach((docSnap) => {
                     points.push({ firebaseId: docSnap.id, ...docSnap.data() });
@@ -371,11 +420,94 @@
                 document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
                 renderPoints();
             }, (error) => {
-                console.error("Error de sincronización: ", error);
-                document.getElementById('syncStatus').innerText = "Error de conexión";
+                console.error("Error de puntos: ", error);
+            });
+
+            // Sincronizar Noticias
+            const qNews = query(collection(db, "searchconnect_news"), orderBy("id", "desc"));
+            onSnapshot(qNews, (snapshot) => {
+                newsList = [];
+                snapshot.forEach((docSnap) => {
+                    newsList.push({ firebaseId: docSnap.id, ...docSnap.data() });
+                });
+                renderNews();
+            }, (error) => {
+                console.error("Error de noticias: ", error);
             });
         }
 
+        // Funciones de Modales para Noticias
+        window.openNewsAuthModal = function() {
+            document.getElementById('newsAuthPassword').value = '';
+            document.getElementById('newsAuthError').classList.add('hidden');
+            document.getElementById('newsAuthModal').classList.remove('hidden');
+            document.getElementById('newsAuthModal').classList.add('flex');
+        }
+
+        window.closeNewsAuthModal = function() {
+            document.getElementById('newsAuthModal').classList.remove('flex');
+            document.getElementById('newsAuthModal').classList.add('hidden');
+        }
+
+        window.verifyNewsPassword = function() {
+            const pwd = document.getElementById('newsAuthPassword').value;
+            const errorEl = document.getElementById('newsAuthError');
+            if (pwd === "Admin12345678") {
+                closeNewsAuthModal();
+                document.getElementById('newsForm').reset();
+                document.getElementById('createNewsModal').classList.remove('hidden');
+                document.getElementById('createNewsModal').classList.add('flex');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        window.closeCreateNewsModal = function() {
+            document.getElementById('createNewsModal').classList.remove('flex');
+            document.getElementById('createNewsModal').classList.add('hidden');
+        }
+
+        window.saveNews = async function(e) {
+            e.preventDefault();
+            const newEntry = {
+                id: Date.now(),
+                type: document.getElementById('newsType').value,
+                title: document.getElementById('newsTitle').value.trim(),
+                description: document.getElementById('newsDescription').value.trim(),
+                date: 'Hoy'
+            };
+
+            try {
+                await addDoc(collection(db, "searchconnect_news"), newEntry);
+                closeCreateNewsModal();
+            } catch (error) {
+                alert("Error al publicar la noticia en Firebase: " + error.message);
+            }
+        }
+
+        function renderNews() {
+            const container = document.getElementById('newsContainer');
+            if (newsList.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-center py-4">No hay novedades registradas.</p>`;
+                return;
+            }
+
+            container.innerHTML = newsList.map(n => {
+                let badgeStyle = n.type === 'Reparación' ? 'bg-red-500/10 text-red-400 border-red-500/30' : (n.type === 'Aviso' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' : 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30');
+                return `
+                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="${badgeStyle} border px-2 py-0.5 rounded-md font-semibold text-[10px]">${n.type}</span>
+                            <span class="text-zinc-500">${n.date}</span>
+                        </div>
+                        <h4 class="font-bold text-white leading-snug">${n.title}</h4>
+                        <p class="text-zinc-400 leading-relaxed">${n.description}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Velocidad y Puntos
         window.runSpeedTest = async function() {
             const statusEl = document.getElementById('detectorStatus');
             const qualityLabel = document.getElementById('detectedQualityLabel');
@@ -385,7 +517,7 @@
 
             btn.disabled = true;
             btn.innerText = "Midiendo...";
-            statusEl.innerText = "Descargando paquete de prueba para calcular ancho de banda...";
+            statusEl.innerText = "Descargando paquete de prueba...";
 
             const testImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
             const startTime = performance.now();
@@ -394,18 +526,16 @@
                 const response = await fetch(testImageUrl + '&cache=' + Math.random());
                 const blob = await response.blob();
                 const endTime = performance.now();
-
                 const durationSeconds = (endTime - startTime) / 1000;
                 const speedMbps = ((blob.size * 8) / (durationSeconds * 1024 * 1024)).toFixed(2);
-
                 let quality = speedMbps > 15 ? "Buena" : (speedMbps > 4 ? "Regular" : "Mala");
 
-                statusEl.innerHTML = `<span class="text-[#00FF66] font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Medición completada con éxito.</span>`;
+                statusEl.innerHTML = `<span class="text-[#00FF66] font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Medición exitosa.</span>`;
                 qualityLabel.innerText = quality;
                 speedLabel.innerText = `${speedMbps} Mbps`;
                 statusSelect.value = quality;
             } catch (error) {
-                statusEl.innerText = "No se pudo completar la prueba automática. Selecciona la calidad manualmente.";
+                statusEl.innerText = "No se pudo completar la prueba automática.";
                 qualityLabel.innerText = "Regular";
                 speedLabel.innerText = "12.0 Mbps";
             } finally {
