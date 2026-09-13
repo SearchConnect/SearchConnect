@@ -220,19 +220,19 @@
                     </div>
                 </div>
 
-                <!-- Probador Universal de Velocidad -->
+                <!-- Probador de Velocidad 100% Real -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-gauge-high text-[#00FF66]"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Speed Test en Vivo (100% Real)</span>
                         </div>
-                        <button type="button" onclick="runSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
+                        <button type="button" onclick="runRealSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
                             Medir Ahora
                         </button>
                     </div>
                     <div id="detectorStatus" class="text-xs text-zinc-400">
-                        Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.
+                        Pulsa "Medir Ahora" para descargar un archivo de prueba real y calcular los Mbps exactos de tu conexión actual.
                     </div>
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800 text-xs">
                         <div>
@@ -270,7 +270,7 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
+                    <button type="submit" id="submitBtn" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Guardar y Publicar Globalmente</span>
                     </button>
@@ -420,15 +420,12 @@
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
 
-        // Sincronización en tiempo real segura (sin requerir índices complejos previos)
         function initRealtimeSync() {
-            // Sincronizar Puntos
             onSnapshot(collection(db, "searchconnect_points"), (snapshot) => {
                 points = [];
                 snapshot.forEach((docSnap) => {
                     points.push({ firebaseId: docSnap.id, ...docSnap.data() });
                 });
-                // Ordenar del más reciente al más antiguo en memoria
                 points.sort((a, b) => b.id - a.id);
                 document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
                 filterPoints();
@@ -437,7 +434,6 @@
                 document.getElementById('syncStatus').innerText = "Error de Sincronización";
             });
 
-            // Sincronizar Noticias
             onSnapshot(collection(db, "searchconnect_news"), (snapshot) => {
                 newsList = [];
                 snapshot.forEach((docSnap) => {
@@ -450,7 +446,6 @@
             });
         }
 
-        // Modales de Autenticación y Gestión de Noticias
         window.openNewsAuthModal = function() {
             document.getElementById('newsAuthPassword').value = '';
             document.getElementById('newsAuthError').classList.add('hidden');
@@ -495,9 +490,8 @@
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
                 document.getElementById('newsForm').reset();
                 closeCreateNewsModal();
-                alert("¡Noticia publicada con éxito!");
             } catch (error) {
-                alert("Error al publicar la noticia: " + error.message);
+                console.error("Error al publicar la noticia: " + error.message);
             }
         }
 
@@ -510,9 +504,8 @@
                     );
                     await Promise.all(deletePromises);
                     closeCreateNewsModal();
-                    alert("Se han borrado todas las novedades correctamente.");
                 } catch (error) {
-                    alert("Error al eliminar las novedades: " + error.message);
+                    console.error("Error al eliminar las novedades: " + error.message);
                 }
             }
         }
@@ -543,13 +536,12 @@
             }).join('');
         }
 
-        // Gestión y Guardado de Puntos
         window.openModal = function() {
             document.getElementById('pointForm').reset();
             document.getElementById('photoPreviewContainer').classList.add('hidden');
             document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
             base64PhotoData = '';
-            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real.`;
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para iniciar el Speed Test real.`;
             document.getElementById('detectedQualityLabel').innerText = "Pendiente";
             document.getElementById('detectedSpeedLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
@@ -584,9 +576,8 @@
                     );
                     await Promise.all(deletePromises);
                     closeDeleteModal();
-                    alert("Todos los puntos han sido eliminados de la base de datos.");
                 } catch (error) {
-                    alert("Error al vaciar los puntos: " + error.message);
+                    console.error("Error al vaciar los puntos: " + error.message);
                 }
             } else {
                 errorEl.classList.remove('hidden');
@@ -607,7 +598,8 @@
             }
         }
 
-        window.runSpeedTest = async function() {
+        // SPEED TEST 100% REAL MEDIANTE DESCARGA DE ARCHIVO Y RENDIMIENTO
+        window.runRealSpeedTest = async function() {
             const btn = document.getElementById('speedTestBtn');
             const status = document.getElementById('detectorStatus');
             const qLabel = document.getElementById('detectedQualityLabel');
@@ -615,38 +607,50 @@
             const statusSelect = document.getElementById('pointStatus');
 
             btn.disabled = true;
-            btn.innerText = "Midiendo...";
-            status.innerText = "Calculando velocidad de transferencia...";
+            btn.innerText = "Calculando...";
+            status.innerText = "Midiendo ancho de banda mediante descarga real...";
 
+            // Archivo de imagen de tamaño moderado para forzar cálculo de transferencia real
+            const fileUrl = "https://picsum.photos/1200/800?random=" + Math.random();
             const startTime = performance.now();
-            const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
 
             try {
-                const response = await fetch(imageUrl, { mode: 'no-cors' });
+                const response = await fetch(fileUrl, { cache: 'no-store' });
+                const blob = await response.blob();
                 const endTime = performance.now();
-                const durationSec = (endTime - startTime) / 1000;
-                const fileSizeBits = 15000 * 8; 
-                const speedBps = fileSizeBits / durationSec;
+
+                const durationInSeconds = (endTime - startTime) / 1000;
+                const fileSizeBits = blob.size * 8;
+                const speedBps = fileSizeBits / durationInSeconds;
                 const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
 
                 sLabel.innerText = speedMbps + " Mbps";
 
-                if (speedMbps > 2.5) {
+                if (speedMbps > 4.0) {
                     qLabel.innerText = "Buena (Óptima)";
                     statusSelect.value = "Buena";
-                } else if (speedMbps > 1.0) {
+                } else if (speedMbps > 1.2) {
                     qLabel.innerText = "Regular (Media)";
                     statusSelect.value = "Regular";
                 } else {
                     qLabel.innerText = "Mala (Débil)";
                     statusSelect.value = "Mala";
                 }
-                status.innerText = "¡Prueba completada con éxito!";
+                status.innerText = `¡Test finalizado con éxito! (${(blob.size / 1024).toFixed(0)} KB descargados)`;
             } catch (err) {
-                sLabel.innerText = "N/A";
-                qLabel.innerText = "Regular (Media)";
-                statusSelect.value = "Regular";
-                status.innerText = "Calificación asignada por defecto.";
+                // Si la red bloquea por CORS, usamos Network Information API como respaldo si existe
+                if (navigator.connection && navigator.connection.downlink) {
+                    const fallbackMbps = navigator.connection.downlink;
+                    sLabel.innerText = fallbackMbps + " Mbps (API)";
+                    qLabel.innerText = fallbackMbps > 3 ? "Buena (Óptima)" : (fallbackMbps > 1 ? "Regular (Media)" : "Mala (Débil)");
+                    statusSelect.value = fallbackMbps > 3 ? "Buena" : (fallbackMbps > 1 ? "Regular" : "Mala");
+                    status.innerText = "Medición estimada mediante API de red del dispositivo.";
+                } else {
+                    sLabel.innerText = "N/A";
+                    qLabel.innerText = "Regular (Media)";
+                    statusSelect.value = "Regular";
+                    status.innerText = "No se pudo completar la prueba. Selecciona la calidad manualmente.";
+                }
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Medir Ahora";
@@ -655,6 +659,10 @@
 
         window.savePoint = async function(e) {
             e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>Guardando...</span>`;
+
             const newPoint = {
                 id: Date.now(),
                 name: document.getElementById('pointName').value.trim(),
@@ -668,10 +676,11 @@
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
-                alert("¡Punto registrado y guardado en Firebase exitosamente!");
             } catch (error) {
-                console.error("Error detallado al guardar:", error);
-                alert("Error al guardar en Firebase: " + error.message + "\n\n(Verifica si tus reglas de Firestore permiten escritura pública).");
+                console.error("Error al guardar:", error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Guardar y Publicar Globalmente</span>`;
             }
         }
 
@@ -753,7 +762,6 @@
             }).join('');
         }
 
-        // Inicializar sincronización en tiempo real
         initRealtimeSync();
     </script>
 </body>
