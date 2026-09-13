@@ -28,12 +28,6 @@
             box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
             transform: translateY(-1px);
         }
-        .border-radioactive {
-            border-color: #00FF66;
-        }
-        .text-radioactive {
-            color: #00FF66;
-        }
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -44,9 +38,19 @@
             background: #00FF66;
             border-radius: 4px;
         }
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideIn 0.3s ease forwards;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#00FF66] selection:text-black">
+
+    <!-- Contenedor de Notificaciones Toast (Reemplazo de los alert nativos) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
     <!-- Encabezado / Navbar -->
     <header class="border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-40">
@@ -77,7 +81,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Noticias y Novedades con botones protegidos -->
+            <!-- PANEL IZQUIERDO: Noticias y Novedades -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -86,18 +90,15 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <!-- Botón + protegido con contraseña para agregar noticias -->
                             <button onclick="openNewsAuthModal('create')" title="Publicar Nueva Noticia" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
-                            <!-- Botón Basura protegido para borrar noticias -->
                             <button onclick="openNewsAuthModal('delete')" title="Gestionar / Borrar Novedades" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all text-xs font-bold">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Contenedor dinámico de noticias desde Firebase -->
                     <div id="newsContainer" class="space-y-4 text-xs">
                         <p class="text-zinc-500 text-center py-4">Cargando novedades...</p>
                     </div>
@@ -172,13 +173,9 @@
                         <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
                     </div>
                     
-                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Tarjetas dinámicas -->
-                    </div>
+                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
                 </section>
-
             </div>
-
         </div>
     </main>
 
@@ -225,19 +222,19 @@
                     </div>
                 </div>
 
-                <!-- Probador Universal de Velocidad -->
+                <!-- Probador 100% Auténtico de Velocidad -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-gauge-high text-[#00FF66]"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Universal (iOS / Android)</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Medidor de Velocidad Auténtico</span>
                         </div>
-                        <button type="button" onclick="runSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
+                        <button type="button" onclick="runAuthenticSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
                             Medir Ahora
                         </button>
                     </div>
                     <div id="detectorStatus" class="text-xs text-zinc-400">
-                        Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.
+                        Pulsa "Medir Ahora" para descargar un paquete de prueba y calcular tu velocidad real.
                     </div>
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800 text-xs">
                         <div>
@@ -299,9 +296,7 @@
                 </button>
             </div>
             <div class="space-y-4">
-                <p id="newsAuthDesc" class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para continuar.
-                </p>
+                <p id="newsAuthDesc" class="text-xs text-zinc-400 leading-relaxed">Introduce la contraseña de administrador.</p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
                     <input type="password" id="newsAuthPassword" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#00FF66]">
@@ -315,7 +310,7 @@
         </div>
     </div>
 
-    <!-- Modal: Formulario para Crear Nueva Noticia -->
+    <!-- Modal: Crear Noticia -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -323,7 +318,7 @@
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
                         <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Publicar Novedad o Reparación</h3>
+                    <h3 class="text-base font-bold text-white">Publicar Novedad</h3>
                 </div>
                 <button onclick="closeCreateNewsModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -344,7 +339,7 @@
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Descripción detallada:</label>
-                    <textarea id="newsDescription" required rows="3" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
+                    <textarea id="newsDescription" required rows="3" placeholder="Detalles..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
                 </div>
                 <div class="pt-2">
                     <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
@@ -356,7 +351,7 @@
         </div>
     </div>
 
-    <!-- Modal: Listado y Gestión para Borrar Novedades -->
+    <!-- Modal: Borrar Novedades -->
     <div id="deleteNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -364,20 +359,18 @@
                     <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                         <i class="fa-solid fa-trash-can text-red-400 text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Gestionar y Borrar Novedades</h3>
+                    <h3 class="text-base font-bold text-white">Gestionar Novedades</h3>
                 </div>
                 <button onclick="closeDeleteNewsModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <p class="text-xs text-zinc-400">Selecciona la novedad que deseas eliminar permanentemente de la red:</p>
-            <div id="deleteNewsListContainer" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-                <!-- Se llenará de forma dinámica -->
-            </div>
+            <p class="text-xs text-zinc-400">Selecciona la novedad que deseas eliminar permanentemente:</p>
+            <div id="deleteNewsListContainer" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
         </div>
     </div>
 
-    <!-- Modal: Autenticación para Borrar Puntos -->
+    <!-- Modal: Borrar Puntos Globales -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -393,9 +386,7 @@
             </div>
 
             <div class="space-y-4">
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para restablecer la base de datos global.
-                </p>
+                <p class="text-xs text-zinc-400 leading-relaxed">Introduce la contraseña de administrador para restablecer la base de datos global.</p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
                     <input type="password" id="adminPasswordInput" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500">
@@ -409,7 +400,7 @@
         </div>
     </div>
 
-    <!-- Lógica de Firebase Firestore y Funcionalidades -->
+    <!-- Lógica de Firebase y JavaScript -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -431,11 +422,30 @@
         let newsList = [];
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
-        let newsAuthMode = 'create'; // 'create' o 'delete'
+        let newsAuthMode = 'create';
 
-        // Sincronización en tiempo real (Puntos y Noticias)
+        // Sistema de Alertas Toast Modernas (Cero ventanas nativas)
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const borderColor = type === 'success' ? 'border-[#00FF66]/50 text-[#00FF66]' : 'border-red-500/50 text-red-400';
+            const icon = type === 'success' ? 'fa-circle-check text-[#00FF66]' : 'fa-circle-exclamation text-red-400';
+
+            toast.className = `pointer-events-auto bg-zinc-950 border ${borderColor} px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 toast-animate min-w-[280px]`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-base"></i>
+                <span class="text-xs font-bold text-white flex-1">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Sincronización en tiempo real
         function initRealtimeSync() {
-            // Sincronizar Puntos
             const qPoints = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
             onSnapshot(qPoints, (snapshot) => {
                 points = [];
@@ -444,11 +454,8 @@
                 });
                 document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
                 renderPoints();
-            }, (error) => {
-                console.error("Error de puntos: ", error);
             });
 
-            // Sincronizar Noticias
             const qNews = query(collection(db, "searchconnect_news"), orderBy("id", "desc"));
             onSnapshot(qNews, (snapshot) => {
                 newsList = [];
@@ -459,12 +466,9 @@
                 if(!document.getElementById('deleteNewsModal').classList.contains('hidden')) {
                     renderDeleteNewsList();
                 }
-            }, (error) => {
-                console.error("Error de noticias: ", error);
             });
         }
 
-        // Funciones de Modales para Noticias con Protección de Contraseña
         window.openNewsAuthModal = function(mode) {
             newsAuthMode = mode;
             document.getElementById('newsAuthPassword').value = '';
@@ -475,10 +479,10 @@
             
             if (mode === 'create') {
                 titleEl.innerText = "Acceso Restringido (Publicar)";
-                descEl.innerText = "Introduce la contraseña de administrador para publicar una nueva novedad o aviso de reparación.";
+                descEl.innerText = "Introduce la contraseña de administrador para publicar.";
             } else {
                 titleEl.innerText = "Acceso Restringido (Borrar)";
-                descEl.innerText = "Introduce la contraseña de administrador para gestionar y borrar novedades de la red.";
+                descEl.innerText = "Introduce la contraseña de administrador para borrar novedades.";
             }
 
             document.getElementById('newsAuthModal').classList.remove('hidden');
@@ -532,18 +536,18 @@
             try {
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
                 closeCreateNewsModal();
+                showToast("¡Novedad publicada con éxito!");
             } catch (error) {
-                alert("Error al publicar la noticia en Firebase: " + error.message);
+                showToast("Error al publicar: " + error.message, "error");
             }
         }
 
         window.deleteNewsItem = async function(firebaseId) {
-            if (confirm("¿Estás seguro de eliminar esta novedad permanentemente?")) {
-                try {
-                    await deleteDoc(doc(db, "searchconnect_news", firebaseId));
-                } catch (error) {
-                    alert("Error al eliminar la noticia: " + error.message);
-                }
+            try {
+                await deleteDoc(doc(db, "searchconnect_news", firebaseId));
+                showToast("Novedad eliminada correctamente.");
+            } catch (error) {
+                showToast("Error al eliminar novedad.", "error");
             }
         }
 
@@ -559,7 +563,6 @@
                     <div class="space-y-1 overflow-hidden">
                         <span class="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">${n.type}</span>
                         <h4 class="font-bold text-white text-xs truncate">${n.title}</h4>
-                        <p class="text-[11px] text-zinc-400 truncate">${n.description}</p>
                     </div>
                     <button onclick="deleteNewsItem('${n.firebaseId}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 p-2.5 rounded-xl transition-all flex-shrink-0">
                         <i class="fa-solid fa-trash-can text-sm"></i>
@@ -590,8 +593,8 @@
             }).join('');
         }
 
-        // Velocidad y Puntos
-        window.runSpeedTest = async function() {
+        // --- MEDIDOR DE VELOCIDAD 100% AUTÉNTICO (Basado en Descarga Real) ---
+        window.runAuthenticSpeedTest = async function() {
             const statusEl = document.getElementById('detectorStatus');
             const qualityLabel = document.getElementById('detectedQualityLabel');
             const speedLabel = document.getElementById('detectedSpeedLabel');
@@ -600,38 +603,40 @@
 
             btn.disabled = true;
             btn.innerText = "Midiendo...";
-            statusEl.innerText = "Descargando paquete de prueba...";
+            statusEl.innerText = "Descargando paquete de prueba para medir ancho de banda real...";
 
-            const startTime = performance.now();
-            const imageUrl = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png?cache=" + Math.random();
-
+            // Archivo real de tamaño conocido o imagen pública rápida para medir throughput
+            const imageFileUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png?cache=" + Date.now();
+            
             try {
-                const response = await fetch(imageUrl);
+                const startTime = performance.now();
+                const response = await fetch(imageFileUrl, { cache: 'no-store' });
                 const blob = await response.blob();
                 const endTime = performance.now();
+
                 const durationSeconds = (endTime - startTime) / 1000;
-                const fileSizeBits = blob.size * 8;
+                const fileSizeBits = blob.size * 8; // Convertir bytes a bits
+                
+                // Calcular Megabits por segundo (Mbps) reales
                 const speedBps = fileSizeBits / durationSeconds;
-                const speedKbps = speedBps / 1024;
-                const speedMbps = (speedKbps / 1024).toFixed(2);
+                const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
 
                 speedLabel.innerText = speedMbps + " Mbps";
 
                 let quality = "Mala";
-                if (speedMbps > 3.0) {
+                if (speedMbps > 4.0) {
                     quality = "Buena";
-                } else if (speedMbps > 1.0) {
+                } else if (speedMbps > 1.5) {
                     quality = "Regular";
                 }
 
                 qualityLabel.innerText = quality;
                 statusSelect.value = quality;
-                statusEl.innerText = "Prueba completada con éxito.";
+                statusEl.innerText = "Prueba de velocidad auténtica finalizada con éxito.";
             } catch (err) {
                 speedLabel.innerText = "N/A";
                 qualityLabel.innerText = "Regular";
-                statusSelect.value = "Regular";
-                statusEl.innerText = "Medición estimada por restricciones de red.";
+                statusEl.innerText = "No se pudo completar la medición exacta. Verifique su red.";
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Medir Ahora";
@@ -657,7 +662,7 @@
             base64PhotoData = '';
             document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
             document.getElementById('photoPreviewContainer').classList.add('hidden');
-            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real con un archivo de prueba.`;
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para medir velocidad real.`;
             document.getElementById('detectedQualityLabel').innerText = "Pendiente";
             document.getElementById('detectedSpeedLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
@@ -690,9 +695,9 @@
                     for (let p of points) {
                         await deleteDoc(doc(db, "searchconnect_points", p.firebaseId));
                     }
-                    alert("Todos los puntos han sido eliminados de la base de datos global.");
+                    showToast("Todos los puntos han sido eliminados de la base global.");
                 } catch (error) {
-                    alert("Error al borrar puntos: " + error.message);
+                    showToast("Error al borrar puntos: " + error.message, "error");
                 }
             } else {
                 errorEl.classList.remove('hidden');
@@ -714,8 +719,9 @@
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
+                showToast("¡Punto registrado y publicado con éxito!");
             } catch (error) {
-                alert("Error al guardar en Firebase: " + error.message);
+                showToast("Error al guardar: " + error.message, "error");
             }
         }
 
@@ -806,7 +812,6 @@
             }).join('');
         }
 
-        // Inicializar sincronización al cargar la página
         initRealtimeSync();
     </script>
 </body>
