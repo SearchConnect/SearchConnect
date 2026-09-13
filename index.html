@@ -65,10 +65,6 @@
                     <i class="fa-solid fa-trash-can text-base"></i>
                     <span class="hidden sm:inline">Borrar Puntos</span>
                 </button>
-                <button onclick="openDeleteNewsModal()" class="bg-zinc-900 border border-zinc-800 text-red-400 hover:text-red-300 hover:border-red-500/50 px-3 py-2.5 rounded-xl text-sm flex items-center space-x-2 transition-all">
-                    <i class="fa-solid fa-bullhorn text-base"></i>
-                    <span class="hidden sm:inline">Borrar Novedades</span>
-                </button>
                 <button onclick="openModal()" class="btn-radioactive px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2">
                     <i class="fa-solid fa-plus-circle text-base"></i>
                     <span>Registrar Punto</span>
@@ -90,8 +86,8 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <!-- Botón + protegido con contraseña para agregar noticias -->
-                            <button onclick="openNewsAuthModal()" title="Publicar Nueva Noticia" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
+                            <!-- Botón + protegido con contraseña para gestionar noticias (añadir/borrar) -->
+                            <button onclick="openNewsAuthModal()" title="Gestionar Novedades" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                             <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
@@ -285,7 +281,7 @@
         </div>
     </div>
 
-    <!-- Modal: Contraseña para Publicar Noticias -->
+    <!-- Modal: Contraseña para Gestionar Noticias -->
     <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -301,7 +297,7 @@
             </div>
             <div class="space-y-4">
                 <p class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para publicar una nueva novedad o aviso de reparación.
+                    Introduce la contraseña de administrador para añadir o borrar novedades en la red.
                 </p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
@@ -316,23 +312,26 @@
         </div>
     </div>
 
-    <!-- Modal: Formulario para Crear Nueva Noticia -->
+    <!-- Modal: Panel de Gestión de Novedades (Añadir / Borrar) -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
                         <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Publicar Novedad o Reparación</h3>
+                    <h3 class="text-base font-bold text-white">Gestión de Novedades</h3>
                 </div>
                 <button onclick="closeCreateNewsModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4">
+
+            <!-- Sección 1: Crear Nueva Noticia -->
+            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4 pb-4 border-b border-zinc-900">
+                <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Publicar Nuevo Aviso</h4>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Tipo de Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-400">Tipo de Aviso:</label>
                     <select id="newsType" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="Reparación">Reparación</option>
                         <option value="Aviso">Aviso</option>
@@ -340,20 +339,33 @@
                     </select>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Título del Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-400">Título del Aviso:</label>
                     <input type="text" id="newsTitle" required placeholder="Ej: Mantenimiento Router Edificio B..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Descripción detallada:</label>
-                    <textarea id="newsDescription" required rows="3" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
+                    <label class="text-xs font-semibold text-zinc-400">Descripción detallada:</label>
+                    <textarea id="newsDescription" required rows="2" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
                 </div>
-                <div class="pt-2">
-                    <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>Publicar en la Red</span>
-                    </button>
-                </div>
+                <button type="submit" class="w-full btn-radioactive py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Publicar en la Red</span>
+                </button>
             </form>
+
+            <!-- Sección 2: Borrar todas las Novedades -->
+            <div class="space-y-3 pt-2">
+                <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Zona de Peligro</span>
+                </h4>
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí.
+                </p>
+                <button type="button" onclick="verifyAndDeleteNews()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Borrar Todas las Novedades</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -384,38 +396,6 @@
                 <div class="flex space-x-3 pt-2">
                     <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
                     <button type="button" onclick="verifyAndDeletePoints()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">Borrar Todo</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Autenticación para Borrar Novedades -->
-    <div id="deleteNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-                        <i class="fa-solid fa-shield-halved text-red-400 text-sm"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Borrar Novedades</h3>
-                </div>
-                <button onclick="closeDeleteNewsModal()" class="text-zinc-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-4">
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                    Introduce la contraseña de administrador para vaciar todas las noticias y avisos en Firebase.
-                </p>
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
-                    <input type="password" id="adminNewsPasswordInput" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500">
-                    <p id="deleteNewsErrorMsg" class="text-xs text-red-400 hidden pt-1">Contraseña incorrecta.</p>
-                </div>
-                <div class="flex space-x-3 pt-2">
-                    <button type="button" onclick="closeDeleteNewsModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
-                    <button type="button" onclick="verifyAndDeleteNews()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20">Borrar Novedades</button>
                 </div>
             </div>
         </div>
@@ -515,9 +495,25 @@
 
             try {
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
-                closeCreateNewsModal();
+                document.getElementById('newsForm').reset();
+                alert("¡Noticia publicada con éxito!");
             } catch (error) {
                 alert("Error al publicar la noticia en Firebase: " + error.message);
+            }
+        }
+
+        window.verifyAndDeleteNews = async function() {
+            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades?")) {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
+                    const deletePromises = querySnapshot.docs.map((documentSnap) => 
+                        deleteDoc(doc(db, "searchconnect_news", documentSnap.id))
+                    );
+                    await Promise.all(deletePromises);
+                    closeCreateNewsModal();
+                } catch (error) {
+                    alert("Error al eliminar las novedades de Firebase.");
+                }
             }
         }
 
@@ -621,39 +617,6 @@
                     closeDeleteModal();
                 } catch (error) {
                     alert("Error al eliminar los registros de Firebase.");
-                }
-            } else {
-                errorMsg.classList.remove('hidden');
-            }
-        }
-
-        // Funciones para Borrar Novedades
-        window.openDeleteNewsModal = function() {
-            document.getElementById('adminNewsPasswordInput').value = '';
-            document.getElementById('deleteNewsErrorMsg').classList.add('hidden');
-            document.getElementById('deleteNewsModal').classList.remove('hidden');
-            document.getElementById('deleteNewsModal').classList.add('flex');
-        }
-
-        window.closeDeleteNewsModal = function() {
-            document.getElementById('deleteNewsModal').classList.remove('flex');
-            document.getElementById('deleteNewsModal').classList.add('hidden');
-        }
-
-        window.verifyAndDeleteNews = async function() {
-            const pwdInput = document.getElementById('adminNewsPasswordInput').value;
-            const errorMsg = document.getElementById('deleteNewsErrorMsg');
-
-            if (pwdInput === "Admin12345678") {
-                try {
-                    const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
-                    const deletePromises = querySnapshot.docs.map((documentSnap) => 
-                        deleteDoc(doc(db, "searchconnect_news", documentSnap.id))
-                    );
-                    await Promise.all(deletePromises);
-                    closeDeleteNewsModal();
-                } catch (error) {
-                    alert("Error al eliminar las novedades de Firebase.");
                 }
             } else {
                 errorMsg.classList.remove('hidden');
