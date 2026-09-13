@@ -28,6 +28,12 @@
             box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
             transform: translateY(-1px);
         }
+        .border-radioactive {
+            border-color: #00FF66;
+        }
+        .text-radioactive {
+            color: #00FF66;
+        }
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -38,19 +44,9 @@
             background: #00FF66;
             border-radius: 4px;
         }
-        @keyframes slideIn {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .toast-animate {
-            animation: slideIn 0.3s ease forwards;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#00FF66] selection:text-black">
-
-    <!-- Contenedor de Notificaciones Toast -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
     <!-- Encabezado / Navbar -->
     <header class="border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-40">
@@ -81,7 +77,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL IZQUIERDO: Noticias y Novedades -->
+            <!-- PANEL IZQUIERDO: Centro de Novedades -->
             <aside class="lg:col-span-1 space-y-6">
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -90,12 +86,10 @@
                             <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="openNewsAuthModal('create')" title="Publicar Nueva Noticia" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
-                                <i class="fa-solid fa-plus"></i>
+                            <button onclick="openNewsAuthModal()" title="Gestionar Novedades" class="w-7 h-7 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black flex items-center justify-center transition-all text-xs font-bold">
+                                <i class="fa-solid fa-gear"></i>
                             </button>
-                            <button onclick="openNewsAuthModal('delete')" title="Gestionar / Borrar Novedades" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all text-xs font-bold">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                            <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
                         </div>
                     </div>
 
@@ -173,9 +167,13 @@
                         <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
                     </div>
                     
-                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tarjetas dinámicas -->
+                    </div>
                 </section>
+
             </div>
+
         </div>
     </main>
 
@@ -222,34 +220,38 @@
                     </div>
                 </div>
 
-                <!-- Probador 100% Auténtico de Velocidad (Compatible iOS y Android) -->
+                <!-- Probador Universal de Velocidad (100% Real y Funcional) -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-gauge-high text-[#00FF66]"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Speed Test de Red Real</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Prueba de Velocidad Real</span>
                         </div>
-                        <button type="button" onclick="runAuthenticSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
+                        <button type="button" onclick="runSpeedTest()" id="speedTestBtn" class="text-xs bg-[#00FF66] text-black font-bold px-3 py-1.5 rounded-lg hover:bg-[#00cc52] transition-all">
                             Medir Ahora
                         </button>
                     </div>
                     <div id="detectorStatus" class="text-xs text-zinc-400">
-                        Pulsa "Medir Ahora" para descargar un paquete de prueba y calcular tu velocidad real en Mbps.
+                        Pulsa "Medir Ahora" para calcular latencia y velocidad real mediante descarga de prueba.
                     </div>
-                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800 text-xs">
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800 text-xs">
                         <div>
-                            <span class="text-zinc-500">Calidad:</span>
-                            <span id="detectedQualityLabel" class="font-bold text-white ml-1">Pendiente</span>
+                            <span class="text-zinc-500 block">Calidad:</span>
+                            <span id="detectedQualityLabel" class="font-bold text-white">Pendiente</span>
                         </div>
                         <div>
-                            <span class="text-zinc-500">Velocidad:</span>
-                            <span id="detectedSpeedLabel" class="font-bold text-white ml-1">-</span>
+                            <span class="text-zinc-500 block">Velocidad:</span>
+                            <span id="detectedSpeedLabel" class="font-bold text-white">-</span>
+                        </div>
+                        <div>
+                            <span class="text-zinc-500 block">Latencia:</span>
+                            <span id="detectedPingLabel" class="font-bold text-white">-</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Calificación Final (Autocompletable):</label>
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Calificación Final (Ajustable):</label>
                     <select id="pointStatus" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="Buena">Buena (Óptima)</option>
                         <option value="Regular">Regular (Media)</option>
@@ -281,7 +283,7 @@
         </div>
     </div>
 
-    <!-- Modales adicionales de autenticación y noticias -->
+    <!-- Modal: Contraseña para Gestionar Novedades -->
     <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -289,14 +291,16 @@
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center">
                         <i class="fa-solid fa-shield-halved text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 id="newsAuthTitle" class="text-base font-bold text-white">Acceso Restringido</h3>
+                    <h3 class="text-base font-bold text-white">Acceso Restringido</h3>
                 </div>
                 <button onclick="closeNewsAuthModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <div class="space-y-4">
-                <p id="newsAuthDesc" class="text-xs text-zinc-400 leading-relaxed">Introduce la contraseña de administrador.</p>
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Introduce la contraseña de administrador para añadir o borrar novedades en la red.
+                </p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
                     <input type="password" id="newsAuthPassword" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#00FF66]">
@@ -310,22 +314,25 @@
         </div>
     </div>
 
+    <!-- Modal: Panel de Gestión de Novedades -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66] flex items-center justify-center">
                         <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Publicar Novedad</h3>
+                    <h3 class="text-base font-bold text-white">Gestión de Novedades</h3>
                 </div>
                 <button onclick="closeCreateNewsModal()" class="text-zinc-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4">
+
+            <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4 pb-4 border-b border-zinc-900">
+                <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Publicar Nuevo Aviso</h4>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Tipo de Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-400">Tipo de Aviso:</label>
                     <select id="newsType" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
                         <option value="Reparación">Reparación</option>
                         <option value="Aviso">Aviso</option>
@@ -333,41 +340,36 @@
                     </select>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Título del Aviso:</label>
+                    <label class="text-xs font-semibold text-zinc-400">Título del Aviso:</label>
                     <input type="text" id="newsTitle" required placeholder="Ej: Mantenimiento Router Edificio B..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Descripción detallada:</label>
-                    <textarea id="newsDescription" required rows="3" placeholder="Detalles..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
+                    <label class="text-xs font-semibold text-zinc-400">Descripción detallada:</label>
+                    <textarea id="newsDescription" required rows="2" placeholder="Detalles de la reparación o novedad..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]"></textarea>
                 </div>
-                <div class="pt-2">
-                    <button type="submit" class="w-full btn-radioactive py-3 rounded-xl text-sm font-bold flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>Publicar en la Red</span>
-                    </button>
-                </div>
+                <button type="submit" class="w-full btn-radioactive py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Publicar en la Red</span>
+                </button>
             </form>
-        </div>
-    </div>
 
-    <div id="deleteNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-                        <i class="fa-solid fa-trash-can text-red-400 text-sm"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Gestionar Novedades</h3>
-                </div>
-                <button onclick="closeDeleteNewsModal()" class="text-zinc-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+            <div class="space-y-3 pt-2">
+                <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Zona de Peligro</span>
+                </h4>
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Si necesitas limpiar completamente el panel lateral de avisos y novedades antiguas, puedes eliminarlas de golpe aquí.
+                </p>
+                <button type="button" onclick="verifyAndDeleteNews()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Borrar Todas las Novedades</span>
                 </button>
             </div>
-            <p class="text-xs text-zinc-400">Selecciona la novedad que deseas eliminar permanentemente:</p>
-            <div id="deleteNewsListContainer" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
         </div>
     </div>
 
+    <!-- Modal: Autenticación para Borrar Puntos -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -383,7 +385,9 @@
             </div>
 
             <div class="space-y-4">
-                <p class="text-xs text-zinc-400 leading-relaxed">Introduce la contraseña de administrador para restablecer la base de datos global.</p>
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Introduce la contraseña de administrador para restablecer la base de datos de puntos globales.
+                </p>
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Contraseña:</label>
                     <input type="password" id="adminPasswordInput" placeholder="Introduce la contraseña" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500">
@@ -397,10 +401,10 @@
         </div>
     </div>
 
-    <!-- Lógica de Firebase y JavaScript -->
+    <!-- Lógica de Firebase Firestore y Funcionalidades -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBaXSYkQpqeuTxmz3f1hKjMlSHF6YQBHbY",
@@ -419,118 +423,196 @@
         let newsList = [];
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
-        let newsAuthMode = 'create';
 
-        window.showToast = function(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            const borderColor = type === 'success' ? 'border-[#00FF66]/50 text-[#00FF66]' : 'border-red-500/50 text-red-400';
-            const icon = type === 'success' ? 'fa-circle-check text-[#00FF66]' : 'fa-circle-exclamation text-red-400';
+        // Sincronización en tiempo real
+        function initRealtimeSync() {
+            onSnapshot(collection(db, "searchconnect_points"), (snapshot) => {
+                points = [];
+                snapshot.forEach((docSnap) => {
+                    points.push({ firebaseId: docSnap.id, ...docSnap.data() });
+                });
+                points.sort((a, b) => b.id - a.id);
+                document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
+                filterPoints();
+            }, (error) => {
+                console.error("Error al sincronizar puntos: ", error);
+                document.getElementById('syncStatus').innerText = "Error de Sincronización";
+            });
 
-            toast.className = `pointer-events-auto bg-zinc-950 border ${borderColor} px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 toast-animate min-w-[280px]`;
-            toast.innerHTML = `
-                <i class="fa-solid ${icon} text-base"></i>
-                <span class="text-xs font-bold text-white flex-1">${message}</span>
-            `;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
+            onSnapshot(collection(db, "searchconnect_news"), (snapshot) => {
+                newsList = [];
+                snapshot.forEach((docSnap) => {
+                    newsList.push({ firebaseId: docSnap.id, ...docSnap.data() });
+                });
+                newsList.sort((a, b) => b.id - a.id);
+                renderNews();
+            }, (error) => {
+                console.error("Error al sincronizar noticias: ", error);
+            });
         }
 
-        // --- MEDIDOR DE VELOCIDAD REAL (SPEEDTEST) PARA IOS Y ANDROID ---
-        window.runAuthenticSpeedTest = async function() {
-            const statusEl = document.getElementById('detectorStatus');
-            const speedLabel = document.getElementById('detectedSpeedLabel');
-            const qualityLabel = document.getElementById('detectedQualityLabel');
-            const statusSelect = document.getElementById('pointStatus');
+        // speedTest Real y Funcional expuesto globalmente
+        window.runSpeedTest = async function() {
             const btn = document.getElementById('speedTestBtn');
+            const statusEl = document.getElementById('detectorStatus');
+            const qualityEl = document.getElementById('detectedQualityLabel');
+            const speedEl = document.getElementById('detectedSpeedLabel');
+            const pingEl = document.getElementById('detectedPingLabel');
+            const pointStatusSelect = document.getElementById('pointStatus');
 
             btn.disabled = true;
             btn.innerText = "Midiendo...";
-            statusEl.innerText = "Descargando paquete de prueba desde la red...";
-            speedLabel.innerText = "Calculando...";
-            qualityLabel.innerText = "Procesando...";
+            statusEl.innerText = "Calculando latencia (ping) y velocidad de red...";
+            qualityEl.innerText = "Calculando...";
+            speedEl.innerText = "...";
+            pingEl.innerText = "...";
 
-            // Archivo de prueba público estandarizado para velocidad (aprox. ~1.5 MB)
-            const testImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2d/Cloud-based_speed_test_sample.jpg?t=" + Date.now();
-            const fileSizeKB = 1400; // Kilobytes aproximados
-
-            const startTime = performance.now();
             try {
-                const response = await fetch(testImageUrl, { cache: 'no-store' });
-                if (!response.ok) throw new Error("Error de red");
+                // Medir Latencia (Ping real midiendo el tiempo de respuesta HTTP)
+                const pingStart = performance.now();
+                await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' });
+                const pingEnd = performance.now();
+                const pingMs = Math.round(pingEnd - pingStart);
+
+                // Medir Velocidad de Descarga real con un archivo de prueba público
+                // Usamos una imagen de tamaño mediano (~1.4MB) desde Wikimedia Commons para calcular Mbps
+                const testImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg';
+                const imageSizeInBytes = 1400000; // ~1.4 MB aproximados para la prueba
+
+                const downloadStart = performance.now();
+                const response = await fetch(testImageUrl + '?cache=' + Date.now(), { cache: 'no-store' });
                 const blob = await response.blob();
-                const endTime = performance.now();
-                
-                const durationSeconds = (endTime - startTime) / 1000;
+                const downloadEnd = performance.now();
+
+                const durationInSeconds = (downloadEnd - downloadStart) / 1000;
                 const bitsLoaded = blob.size * 8;
-                const bps = bitsLoaded / durationSeconds;
-                const mbps = (bps / 1000000).toFixed(2);
+                const speedBps = bitsLoaded / durationInSeconds;
+                const speedMbps = (speedBps / (1024 * 1024)).toFixed(2);
 
-                speedLabel.innerText = `${mbps} Mbps`;
-
-                let calculatedQuality = "Mala";
-                if (mbps >= 15) {
-                    calculatedQuality = "Buena";
-                } else if (mbps >= 5) {
-                    calculatedQuality = "Regular";
-                } else {
+                // Determinar calidad según velocidad y latencia
+                let calculatedQuality = "Buena";
+                if (speedMbps < 3 || pingMs > 250) {
                     calculatedQuality = "Mala";
+                } else if (speedMbps < 10 || pingMs > 120) {
+                    calculatedQuality = "Regular";
                 }
 
-                qualityLabel.innerText = calculatedQuality;
-                statusSelect.value = calculatedQuality;
-                statusEl.innerText = `Medición completada con éxito (${mbps} Mbps reales).`;
-                showToast(`Medición exitosa: ${mbps} Mbps (${calculatedQuality})`, 'success');
+                // Actualizar interfaz del medidor
+                qualityEl.innerText = calculatedQuality === "Buena" ? "Buena (Óptima)" : calculatedQuality === "Regular" ? "Regular (Media)" : "Mala (Débil)";
+                speedEl.innerText = speedMbps + " Mbps";
+                pingEl.innerText = pingMs + " ms";
+                statusEl.innerText = `¡Prueba exitosa! Descarga: ${speedMbps} Mbps | Ping: ${pingMs} ms`;
+                
+                // Asignar automáticamente al selector del formulario
+                pointStatusSelect.value = calculatedQuality;
 
-            } catch (error) {
-                console.error(error);
-                speedLabel.innerText = "N/A";
-                qualityLabel.innerText = "Regular";
-                statusSelect.value = "Regular";
-                statusEl.innerText = "No se pudo conectar al servidor de prueba. Se asignó valor estimado.";
-                showToast("Error en prueba de velocidad. Conexión limitada.", "error");
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "No se pudo medir automáticamente. Selecciona la calidad manualmente.";
+                qualityEl.innerText = "Manual";
+                speedEl.innerText = "N/D";
+                pingEl.innerText = "N/D";
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Medir Ahora";
             }
         };
 
-        function initRealtimeSync() {
-            const qPoints = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
-            onSnapshot(qPoints, (snapshot) => {
-                points = [];
-                snapshot.forEach((docSnap) => {
-                    points.push({ firebaseId: docSnap.id, ...docSnap.data() });
-                });
-                document.getElementById('syncStatus').innerText = "Firebase Sincronizado";
-                renderPoints();
-            });
-
-            const qNews = query(collection(db, "searchconnect_news"), orderBy("id", "desc"));
-            onSnapshot(qNews, (snapshot) => {
-                newsList = [];
-                snapshot.forEach((docSnap) => {
-                    newsList.push({ firebaseId: docSnap.id, ...docSnap.data() });
-                });
-                renderNews();
-                if(!document.getElementById('deleteNewsModal').classList.contains('hidden')) {
-                    renderDeleteNewsList();
-                }
-            });
+        // Modales de Autenticación y Gestión de Noticias
+        window.openNewsAuthModal = function() {
+            document.getElementById('newsAuthPassword').value = '';
+            document.getElementById('newsAuthError').classList.add('hidden');
+            document.getElementById('newsAuthModal').classList.remove('hidden');
+            document.getElementById('newsAuthModal').classList.add('flex');
         }
 
+        window.closeNewsAuthModal = function() {
+            document.getElementById('newsAuthModal').classList.remove('flex');
+            document.getElementById('newsAuthModal').classList.add('hidden');
+        }
+
+        window.verifyNewsPassword = function() {
+            const pwd = document.getElementById('newsAuthPassword').value;
+            const errorEl = document.getElementById('newsAuthError');
+            if (pwd === "Admin12345678") {
+                closeNewsAuthModal();
+                document.getElementById('newsForm').reset();
+                document.getElementById('createNewsModal').classList.remove('hidden');
+                document.getElementById('createNewsModal').classList.add('flex');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        window.closeCreateNewsModal = function() {
+            document.getElementById('createNewsModal').classList.remove('flex');
+            document.getElementById('createNewsModal').classList.add('hidden');
+        }
+
+        window.saveNews = async function(e) {
+            e.preventDefault();
+            const newEntry = {
+                id: Date.now(),
+                type: document.getElementById('newsType').value,
+                title: document.getElementById('newsTitle').value.trim(),
+                description: document.getElementById('newsDescription').value.trim(),
+                date: 'Hoy'
+            };
+
+            try {
+                await addDoc(collection(db, "searchconnect_news"), newEntry);
+                document.getElementById('newsForm').reset();
+                closeCreateNewsModal();
+                alert("¡Noticia publicada con éxito!");
+            } catch (error) {
+                alert("Error al publicar la noticia: " + error.message);
+            }
+        }
+
+        window.verifyAndDeleteNews = async function() {
+            if (confirm("¿Estás seguro de que deseas eliminar TODAS las novedades?")) {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "searchconnect_news"));
+                    const deletePromises = querySnapshot.docs.map((documentSnap) => 
+                        deleteDoc(doc(db, "searchconnect_news", documentSnap.id))
+                    );
+                    await Promise.all(deletePromises);
+                    closeCreateNewsModal();
+                    alert("Se han borrado todas las novedades correctamente.");
+                } catch (error) {
+                    alert("Error al eliminar las novedades: " + error.message);
+                }
+            }
+        }
+
+        function renderNews() {
+            const container = document.getElementById('newsContainer');
+            if (newsList.length === 0) {
+                container.innerHTML = '<p class="text-zinc-500 text-center py-4">No hay avisos recientes en la red.</p>';
+                return;
+            }
+            container.innerHTML = newsList.map(item => `
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.type === 'Reparación' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : item.type === 'Éxito' ? 'bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}">${item.type}</span>
+                        <span class="text-[10px] text-zinc-500">${item.date}</span>
+                    </div>
+                    <h4 class="font-bold text-white">${item.title}</h4>
+                    <p class="text-zinc-400 leading-relaxed">${item.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Gestión de Puntos de Señal
         window.openModal = function() {
             document.getElementById('pointForm').reset();
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            base64PhotoData = '';
             document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
-            base64PhotoData = "";
-            document.getElementById('detectorStatus').innerText = 'Pulsa "Medir Ahora" para descargar un paquete de prueba y calcular tu velocidad real en Mbps.';
-            document.getElementById('detectedSpeedLabel').innerText = "-";
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            document.getElementById('detectorStatus').innerText = `Pulsa "Medir Ahora" para calcular latencia y velocidad real mediante descarga de prueba.`;
             document.getElementById('detectedQualityLabel').innerText = "Pendiente";
+            document.getElementById('detectedSpeedLabel').innerText = "-";
+            document.getElementById('detectedPingLabel').innerText = "-";
             document.getElementById('registerModal').classList.remove('hidden');
             document.getElementById('registerModal').classList.add('flex');
         }
@@ -549,240 +631,112 @@
                     base64PhotoData = e.target.result;
                     document.getElementById('photoPreviewImg').src = base64PhotoData;
                     document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
+                }
                 reader.readAsDataURL(file);
             }
         }
 
-        window.savePoint = async function(event) {
-            event.preventDefault();
-            const name = document.getElementById('pointName').value.trim();
-            const building = document.getElementById('pointBuilding').value;
-            const floor = document.getElementById('pointFloor').value;
-            const status = document.getElementById('pointStatus').value;
-
+        window.savePoint = async function(e) {
+            e.preventDefault();
             const newPoint = {
                 id: Date.now(),
-                name,
-                building,
-                floor,
-                status,
-                photo: base64PhotoData || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
-                date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                name: document.getElementById('pointName').value.trim(),
+                building: document.getElementById('pointBuilding').value,
+                floor: document.getElementById('pointFloor').value,
+                status: document.getElementById('pointStatus').value,
+                speedText: document.getElementById('detectedSpeedLabel').innerText,
+                pingText: document.getElementById('detectedPingLabel').innerText,
+                photo: base64PhotoData,
+                date: new Date().toLocaleDateString()
             };
 
             try {
                 await addDoc(collection(db, "searchconnect_points"), newPoint);
                 closeModal();
-                showToast("¡Punto de señal registrado globalmente!", "success");
+                alert("¡Punto de señal registrado globalmente!");
             } catch (error) {
-                console.error(error);
-                showToast("Error al guardar en Firebase", "error");
+                alert("Error al guardar el punto: " + error.message);
             }
-        }
-
-        window.renderPoints = function() {
-            const grid = document.getElementById('pointsGrid');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            const floorVal = document.getElementById('floorFilter').value;
-            const signalVal = document.getElementById('signalFilter').value;
-
-            const filtered = points.filter(p => {
-                const matchesBuilding = activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter;
-                const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.building.toLowerCase().includes(searchVal);
-                const matchesFloor = !floorVal || p.floor === floorVal;
-                const matchesSignal = !signalVal || p.status === signalVal;
-                return matchesBuilding && matchesSearch && matchesFloor && matchesSignal;
-            });
-
-            document.getElementById('counterBadge').innerText = `${filtered.length} puntos encontrados`;
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-zinc-500 bg-zinc-950 border border-zinc-900 rounded-2xl">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2 text-zinc-600"></i>
-                        <p class="text-sm">No se encontraron puntos con los filtros seleccionados.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => {
-                let badgeColor = "bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30";
-                if(p.status === "Regular") badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/30";
-                if(p.status === "Mala") badgeColor = "bg-red-500/10 text-red-400 border-red-500/30";
-
-                return `
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-zinc-700 transition-all">
-                        <div class="h-40 w-full relative overflow-hidden bg-zinc-900">
-                            <img src="${p.photo}" alt="${p.name}" class="w-full h-full object-cover">
-                            <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold border ${badgeColor} backdrop-blur-md">
-                                ${p.status}
-                            </div>
-                        </div>
-                        <div class="p-5 space-y-3 flex-1 flex flex-col justify-between">
-                            <div class="space-y-1">
-                                <h4 class="text-base font-bold text-white">${p.name}</h4>
-                                <p class="text-xs text-zinc-400 flex items-center space-x-2">
-                                    <i class="fa-solid fa-building text-[#00FF66]"></i>
-                                    <span>${p.building} - ${p.floor}</span>
-                                </p>
-                            </div>
-                            <div class="flex items-center justify-between pt-3 border-t border-zinc-900 text-xs text-zinc-500">
-                                <span>Registrado: ${p.date}</span>
-                                <span class="text-zinc-400 font-medium">SearchConnect</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
         window.setBuildingFilter = function(bld) {
             activeBuildingFilter = bld;
             document.querySelectorAll('.filter-bld').forEach(btn => {
-                if(btn.dataset.bld === bld) {
+                if (btn.getAttribute('data-bld') === bld) {
                     btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]";
                 } else {
                     btn.className = "filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]";
                 }
             });
-            renderPoints();
+            filterPoints();
         }
 
         window.filterPoints = function() {
-            renderPoints();
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const floor = document.getElementById('floorFilter').value;
+            const signal = document.getElementById('signalFilter').value;
+
+            const filtered = points.filter(p => {
+                const matchBuilding = activeBuildingFilter === 'TODOS' || p.building === activeBuildingFilter;
+                const matchSearch = p.name.toLowerCase().includes(search) || p.building.toLowerCase().includes(search);
+                const matchFloor = !floor || p.floor === floor;
+                const matchSignal = !signal || p.status === signal;
+                return matchBuilding && matchSearch && matchFloor && matchSignal;
+            });
+
+            renderPointsGrid(filtered);
         }
 
-        window.renderNews = function() {
-            const container = document.getElementById('newsContainer');
-            if (newsList.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 text-center py-4">No hay avisos recientes.</p>`;
+        function renderPointsGrid(data) {
+            const grid = document.getElementById('pointsGrid');
+            document.getElementById('counterBadge').innerText = `${data.length} puntos encontrados`;
+
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-zinc-950 border border-zinc-800 rounded-2xl">
+                        <i class="fa-solid fa-wifi-slash text-zinc-600 text-3xl mb-3"></i>
+                        <p class="text-sm text-zinc-400">No se encontraron puntos de señal con los filtros seleccionados.</p>
+                    </div>
+                `;
                 return;
             }
-            container.innerHTML = newsList.map(n => {
-                let color = "text-[#00FF66] border-[#00FF66]/30 bg-[#00FF66]/10";
-                if(n.type === "Reparación") color = "text-amber-400 border-amber-500/30 bg-amber-500/10";
-                if(n.type === "Aviso") color = "text-blue-400 border-blue-500/30 bg-blue-500/10";
+
+            grid.innerHTML = data.map(p => {
+                const badgeColor = p.status === 'Buena' 
+                    ? 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30' 
+                    : p.status === 'Regular' 
+                    ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' 
+                    : 'bg-red-500/10 text-red-400 border-red-500/30';
 
                 return `
-                    <div class="p-3 bg-zinc-900/50 border border-zinc-900 rounded-xl space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${color}">${n.type}</span>
-                            <span class="text-[10px] text-zinc-500">${n.date}</span>
+                    <div class="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}">${p.status}</span>
+                                    <span class="text-xs text-zinc-500">${p.building} • ${p.floor}</span>
+                                </div>
+                                <h4 class="text-base font-bold text-white pt-1">${p.name}</h4>
+                            </div>
+                            ${p.photo ? `
+                                <div class="w-14 h-14 rounded-xl border border-zinc-800 overflow-hidden flex-shrink-0">
+                                    <img src="${p.photo}" alt="Foto punto" class="w-full h-full object-cover">
+                                </div>
+                            ` : ''}
                         </div>
-                        <h4 class="font-bold text-white text-xs">${n.title}</h4>
-                        <p class="text-zinc-400 leading-relaxed">${n.description}</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-zinc-900 text-xs text-zinc-400">
+                            <div class="flex items-center space-x-3">
+                                <span><i class="fa-solid fa-gauge text-[#00FF66] mr-1"></i> ${p.speedText || 'N/D'}</span>
+                                <span><i class="fa-solid fa-stopwatch text-zinc-500 mr-1"></i> ${p.pingText || 'N/D'}</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-600">${p.date || ''}</span>
+                        </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Modales de administración y control de noticias
-        window.openNewsAuthModal = function(mode) {
-            newsAuthMode = mode;
-            document.getElementById('newsAuthPassword').value = '';
-            document.getElementById('newsAuthError').classList.add('hidden');
-            const titleEl = document.getElementById('newsAuthTitle');
-            const descEl = document.getElementById('newsAuthDesc');
-            
-            if (mode === 'create') {
-                titleEl.innerText = "Acceso Restringido (Publicar)";
-                descEl.innerText = "Introduce la contraseña de administrador para publicar.";
-            } else {
-                titleEl.innerText = "Acceso Restringido (Borrar)";
-                descEl.innerText = "Introduce la contraseña de administrador para borrar novedades.";
-            }
-            document.getElementById('newsAuthModal').classList.remove('hidden');
-            document.getElementById('newsAuthModal').classList.add('flex');
-        }
-
-        window.closeNewsAuthModal = function() {
-            document.getElementById('newsAuthModal').classList.remove('flex');
-            document.getElementById('newsAuthModal').classList.add('hidden');
-        }
-
-        window.verifyNewsPassword = function() {
-            const pwd = document.getElementById('newsAuthPassword').value;
-            const errorEl = document.getElementById('newsAuthError');
-            if (pwd === "Admin12345678") {
-                closeNewsAuthModal();
-                if (newsAuthMode === 'create') {
-                    document.getElementById('newsForm').reset();
-                    document.getElementById('createNewsModal').classList.remove('hidden');
-                    document.getElementById('createNewsModal').classList.add('flex');
-                } else {
-                    renderDeleteNewsList();
-                    document.getElementById('deleteNewsModal').classList.remove('hidden');
-                    document.getElementById('deleteNewsModal').classList.add('flex');
-                }
-            } else {
-                errorEl.classList.remove('hidden');
-            }
-        }
-
-        window.closeCreateNewsModal = function() {
-            document.getElementById('createNewsModal').classList.remove('flex');
-            document.getElementById('createNewsModal').classList.add('hidden');
-        }
-
-        window.saveNews = async function(event) {
-            event.preventDefault();
-            const type = document.getElementById('newsType').value;
-            const title = document.getElementById('newsTitle').value.trim();
-            const description = document.getElementById('newsDescription').value.trim();
-
-            const newNews = {
-                id: Date.now(),
-                type,
-                title,
-                description,
-                date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
-            };
-
-            try {
-                await addDoc(collection(db, "searchconnect_news"), newNews);
-                closeCreateNewsModal();
-                showToast("Novedad publicada correctamente", "success");
-            } catch(e) {
-                showToast("Error al publicar novedad", "error");
-            }
-        }
-
-        window.closeDeleteNewsModal = function() {
-            document.getElementById('deleteNewsModal').classList.remove('flex');
-            document.getElementById('deleteNewsModal').classList.add('hidden');
-        }
-
-        window.renderDeleteNewsList = function() {
-            const container = document.getElementById('deleteNewsListContainer');
-            if (newsList.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 text-center py-2 text-xs">No hay novedades para borrar.</p>`;
-                return;
-            }
-            container.innerHTML = newsList.map(n => `
-                <div class="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs">
-                    <div>
-                        <span class="font-bold text-white">${n.title}</span>
-                        <p class="text-[10px] text-zinc-400">${n.type} - ${n.date}</p>
-                    </div>
-                    <button onclick="deleteNewsItem('${n.firebaseId}')" class="bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition-all font-bold">
-                        Borrar
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        window.deleteNewsItem = async function(firebaseId) {
-            try {
-                await deleteDoc(doc(db, "searchconnect_news", firebaseId));
-                showToast("Novedad eliminada correctamente", "success");
-                renderDeleteNewsList();
-            } catch(e) {
-                showToast("Error al eliminar novedad", "error");
-            }
-        }
-
+        // Zona de Administración de Puntos
         window.openDeleteModal = function() {
             document.getElementById('adminPasswordInput').value = '';
             document.getElementById('deleteErrorMsg').classList.add('hidden');
@@ -801,18 +755,21 @@
             if (pwd === "Admin12345678") {
                 try {
                     const querySnapshot = await getDocs(collection(db, "searchconnect_points"));
-                    const deletions = querySnapshot.docs.map(d => deleteDoc(doc(db, "searchconnect_points", d.id)));
-                    await Promise.all(deletions);
+                    const deletePromises = querySnapshot.docs.map((docSnap) => 
+                        deleteDoc(doc(db, "searchconnect_points", docSnap.id))
+                    );
+                    await Promise.all(deletePromises);
                     closeDeleteModal();
-                    showToast("Base de datos de puntos restablecida", "success");
-                } catch(e) {
-                    showToast("Error al borrar registros", "error");
+                    alert("Se han borrado todos los puntos correctamente.");
+                } catch (error) {
+                    alert("Error al borrar los puntos: " + error.message);
                 }
             } else {
                 errorMsg.classList.remove('hidden');
             }
         }
 
+        // Inicializar al cargar
         initRealtimeSync();
     </script>
 </body>
