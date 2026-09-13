@@ -73,79 +73,132 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
-        <!-- Sección Hero y Filtros -->
-        <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo</h2>
-                    <p class="text-sm text-zinc-400">Encuentra y comparte los mejores puntos de conexión en los edificios A, B y C (Pisos 1 al 6).</p>
-                </div>
-                <!-- Indicador de Estado Global -->
-                <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
-                    <span class="relative flex h-3 w-3">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-3 w-3 bg-[#00FF66]"></span>
-                    </span>
-                    <span id="syncStatus" class="text-xs font-medium text-zinc-300">Conectando a Firebase...</span>
-                </div>
-            </div>
-
-            <!-- Filtros Rápidos por Edificio -->
-            <div class="space-y-2">
-                <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Filtrar por Edificio:</label>
-                <div class="flex flex-wrap gap-2" id="building-filters">
-                    <button onclick="setBuildingFilter('TODOS')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]" data-bld="TODOS">Todos</button>
-                    <button onclick="setBuildingFilter('Edificio A')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio A">Edificio A</button>
-                    <button onclick="setBuildingFilter('Edificio B')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio B">Edificio B</button>
-                    <button onclick="setBuildingFilter('Edificio C')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio C">Edificio C</button>
-                </div>
-            </div>
-
-            <!-- Filtros Secundarios y Búsqueda -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-zinc-900">
-                <div class="relative">
-                    <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-zinc-500 text-sm"></i>
-                    <input type="text" id="searchInput" oninput="filterPoints()" placeholder="Buscar por nombre o lugar..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
-                </div>
-                <div>
-                    <select id="floorFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
-                        <option value="">Todos los Pisos (1-6)</option>
-                        <option value="Piso 1">Piso 1</option>
-                        <option value="Piso 2">Piso 2</option>
-                        <option value="Piso 3">Piso 3</option>
-                        <option value="Piso 4">Piso 4</option>
-                        <option value="Piso 5">Piso 5</option>
-                        <option value="Piso 6">Piso 6</option>
-                    </select>
-                </div>
-                <div>
-                    <select id="signalFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
-                        <option value="">Todas las Calidades</option>
-                        <option value="Buena">Buena (Óptima)</option>
-                        <option value="Regular">Regular (Media)</option>
-                        <option value="Mala">Mala (Débil)</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cuadrícula de Puntos -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i class="fa-solid fa-list text-[#00FF66]"></i>
-                    <span>Puntos Registrados Globalmente</span>
-                </h3>
-                <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
-            </div>
+    <!-- Contenido Principal con Distribución de Dos Columnas (Panel Izquierdo y Contenido Central) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Tarjetas dinámicas -->
+            <!-- PANEL IZQUIERDO: Noticias de Reparación y Novedades -->
+            <aside class="lg:col-span-1 space-y-6">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4 sticky top-24">
+                    <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-bullhorn text-[#00FF66] text-sm"></i>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Centro de Novedades</h3>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
+                    </div>
+
+                    <div class="space-y-4 text-xs">
+                        <!-- Noticia 1 -->
+                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Reparación</span>
+                                <span class="text-zinc-500">Hoy</span>
+                            </div>
+                            <h4 class="font-bold text-white leading-snug">Mantenimiento Router Edificio B</h4>
+                            <p class="text-zinc-400 leading-relaxed">Personal técnico estará reparando el nodo principal del piso 3 de 2:00 PM a 4:00 PM.</p>
+                        </div>
+
+                        <!-- Noticia 2 -->
+                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Aviso</span>
+                                <span class="text-zinc-500">Ayer</span>
+                            </div>
+                            <h4 class="font-bold text-white leading-snug">Ampliación de Cobertura Edificio C</h4>
+                            <p class="text-zinc-400 leading-relaxed">Se han instalado 2 nuevos repetidores en el piso 5 para mejorar la señal móvil y Wi-Fi.</p>
+                        </div>
+
+                        <!-- Noticia 3 -->
+                        <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 hover:border-zinc-700 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2 py-0.5 rounded-md font-semibold text-[10px]">Éxito</span>
+                                <span class="text-zinc-500">Hace 3 días</span>
+                            </div>
+                            <h4 class="font-bold text-white leading-snug">Restauración Red Edificio A</h4>
+                            <p class="text-zinc-400 leading-relaxed">Finalizó con éxito el cambio de cableado de fibra óptica en el Auditorio Principal.</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- COLUMNA CENTRAL Y DERECHA: Mapa, Filtros y Cuadrícula de Puntos -->
+            <div class="lg:col-span-3 space-y-8">
+                
+                <!-- Sección Hero y Filtros -->
+                <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Mapa de Cobertura en Vivo</h2>
+                            <p class="text-sm text-zinc-400">Encuentra y comparte los mejores puntos de conexión en los edificios A, B y C (Pisos 1 al 6).</p>
+                        </div>
+                        <!-- Indicador de Estado Global -->
+                        <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
+                            <span class="relative flex h-3 w-3">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF66] opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-3 w-3 bg-[#00FF66]"></span>
+                            </span>
+                            <span id="syncStatus" class="text-xs font-medium text-zinc-300">Conectando a Firebase...</span>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Rápidos por Edificio -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Filtrar por Edificio:</label>
+                        <div class="flex flex-wrap gap-2" id="building-filters">
+                            <button onclick="setBuildingFilter('TODOS')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#00FF66] text-black shadow-[0_0_10px_rgba(0,255,102,0.3)]" data-bld="TODOS">Todos</button>
+                            <button onclick="setBuildingFilter('Edificio A')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio A">Edificio A</button>
+                            <button onclick="setBuildingFilter('Edificio B')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio B">Edificio B</button>
+                            <button onclick="setBuildingFilter('Edificio C')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio C">Edificio C</button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Secundarios y Búsqueda -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-zinc-900">
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-zinc-500 text-sm"></i>
+                            <input type="text" id="searchInput" oninput="filterPoints()" placeholder="Buscar por nombre o lugar..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
+                        </div>
+                        <div>
+                            <select id="floorFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
+                                <option value="">Todos los Pisos (1-6)</option>
+                                <option value="Piso 1">Piso 1</option>
+                                <option value="Piso 2">Piso 2</option>
+                                <option value="Piso 3">Piso 3</option>
+                                <option value="Piso 4">Piso 4</option>
+                                <option value="Piso 5">Piso 5</option>
+                                <option value="Piso 6">Piso 6</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="signalFilter" onchange="filterPoints()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00FF66]">
+                                <option value="">Todas las Calidades</option>
+                                <option value="Buena">Buena (Óptima)</option>
+                                <option value="Regular">Regular (Media)</option>
+                                <option value="Mala">Mala (Débil)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Cuadrícula de Puntos -->
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-list text-[#00FF66]"></i>
+                            <span>Puntos Registrados Globalmente</span>
+                        </h3>
+                        <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
+                    </div>
+                    
+                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tarjetas dinámicas -->
+                    </div>
+                </section>
+
             </div>
-        </section>
+
+        </div>
     </main>
 
     <!-- Modal: Registrar Nuevo Punto -->
@@ -291,7 +344,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Configuración de Firebase integrada correctamente
         const firebaseConfig = {
             apiKey: "AIzaSyBaXSYkQpqeuTxmz3f1hKjMlSHF6YQBHbY",
             authDomain: "searchconnect-6ef24.firebaseapp.com",
@@ -309,7 +361,6 @@
         let activeBuildingFilter = 'TODOS';
         let base64PhotoData = '';
 
-        // Sincronización en tiempo real con Firestore
         function initRealtimeSync() {
             const q = query(collection(db, "searchconnect_points"), orderBy("id", "desc"));
             onSnapshot(q, (snapshot) => {
@@ -325,7 +376,6 @@
             });
         }
 
-        // Prueba de velocidad universal
         window.runSpeedTest = async function() {
             const statusEl = document.getElementById('detectorStatus');
             const qualityLabel = document.getElementById('detectedQualityLabel');
@@ -525,7 +575,6 @@
             }).join('');
         }
 
-        // Iniciar la escucha en tiempo real
         initRealtimeSync();
     </script>
 </body>
