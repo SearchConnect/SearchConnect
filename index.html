@@ -44,7 +44,6 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#00FF66] selection:text-black">
-
     <header class="border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -87,7 +86,6 @@
                             <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
                         </div>
                     </div>
-
                     <div id="newsContainer" class="space-y-4 text-xs">
                         <p class="text-zinc-500 text-center py-4">Cargando novedades...</p>
                     </div>
@@ -96,7 +94,6 @@
 
             <!-- COLUMNA CENTRAL Y DERECHA -->
             <div class="lg:col-span-3 space-y-8">
-                
                 <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -111,7 +108,6 @@
                             <span id="syncStatus" class="text-xs font-medium text-zinc-300">Conectando a Firebase...</span>
                         </div>
                     </div>
-
                     <!-- Filtros Rápidos por Edificio -->
                     <div class="space-y-2">
                         <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Filtrar por Edificio:</label>
@@ -122,7 +118,6 @@
                             <button onclick="setBuildingFilter('Edificio C')" class="filter-bld px-4 py-2 rounded-xl text-xs font-bold transition-all bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-[#00FF66]" data-bld="Edificio C">Edificio C</button>
                         </div>
                     </div>
-
                     <!-- Filtros Secundarios y Búsqueda -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-zinc-900">
                         <div class="relative">
@@ -150,7 +145,7 @@
                         </div>
                     </div>
                 </section>
-
+                
                 <!-- Cuadrícula de Puntos -->
                 <section>
                     <div class="flex items-center justify-between mb-4">
@@ -160,14 +155,9 @@
                         </h3>
                         <span id="counterBadge" class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-medium">0 puntos encontrados</span>
                     </div>
-                    
-                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Tarjetas dinámicas -->
-                    </div>
+                    <div id="pointsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
                 </section>
-
             </div>
-
         </div>
     </main>
 
@@ -184,13 +174,11 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-
             <form id="pointForm" onsubmit="savePoint(event)" class="space-y-4">
                 <div class="space-y-1.5">
                     <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Nombre del Punto / Ubicación:</label>
                     <input type="text" id="pointName" required placeholder="Ej: Aula 302, Cafetería Central..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00FF66]">
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Edificio:</label>
@@ -213,7 +201,7 @@
                     </div>
                 </div>
 
-                <!-- Probador de Velocidad Mejorado y Realista -->
+                <!-- Test de Velocidad -->
                 <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
@@ -248,16 +236,23 @@
                     </select>
                 </div>
 
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Fotografía del Lugar:</label>
-                    <div class="flex items-center space-x-3">
+                <!-- SECCIÓN MEJORADA DE FOTO CON COMPRESIÓN DE LIENZO Y VISTA PREVIA -->
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center justify-between">
+                        <span>Fotografía del Lugar:</span>
+                        <span id="photoStatusInfo" class="text-[10px] text-zinc-500 font-normal">Recomendado formato vertical/horizontal</span>
+                    </label>
+                    <div class="flex items-center space-x-4">
                         <label class="flex-1 cursor-pointer bg-zinc-900 border border-dashed border-zinc-700 hover:border-[#00FF66] rounded-xl p-3 text-center text-xs text-zinc-300 transition-all flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-camera text-[#00FF66]"></i>
-                            <span id="photoFileName">Tomar foto o subir archivo</span>
+                            <i class="fa-solid fa-camera text-[#00FF66] text-base"></i>
+                            <span id="photoFileName" class="truncate max-w-[200px]">Tomar foto o subir archivo</span>
                             <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden">
                         </label>
-                        <div id="photoPreviewContainer" class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 hidden overflow-hidden flex-shrink-0">
-                            <img id="photoPreviewImg" src="" alt="Preview" class="w-full h-full object-cover">
+                        <div id="photoPreviewContainer" class="w-16 h-16 rounded-xl bg-zinc-900 border border-zinc-800 hidden overflow-hidden flex-shrink-0 relative group">
+                            <img id="photoPreviewImg" src="" alt="Vista previa" class="w-full h-full object-cover">
+                            <button type="button" onclick="removePhoto(event)" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-red-400 transition-opacity" title="Quitar foto">
+                                <i class="fa-solid fa-trash-can text-sm"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -272,6 +267,7 @@
         </div>
     </div>
 
+    <!-- Otros Modales de Administración y Novedades -->
     <div id="newsAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -302,7 +298,6 @@
         </div>
     </div>
 
-    <!-- Modal: Panel de Gestión de Novedades -->
     <div id="createNewsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -316,7 +311,6 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-
             <form id="newsForm" onsubmit="saveNews(event)" class="space-y-4 pb-4 border-b border-zinc-900">
                 <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Publicar Nuevo Aviso</h4>
                 <div class="space-y-1.5">
@@ -340,7 +334,6 @@
                     <span>Publicar en la Red</span>
                 </button>
             </form>
-
             <div class="space-y-3 pt-2">
                 <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center space-x-1.5">
                     <i class="fa-solid fa-triangle-exclamation"></i>
@@ -357,7 +350,6 @@
         </div>
     </div>
 
-    <!-- Modal: Autenticación para Borrar Puntos -->
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -371,7 +363,6 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-
             <div class="space-y-4">
                 <p class="text-xs text-zinc-400 leading-relaxed">
                     Introduce la contraseña de administrador para restablecer la base de datos de puntos globales.
@@ -392,7 +383,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBaXSYkQpqeuTxmz3f1hKjMlSHF6YQBHbY",
             authDomain: "searchconnect-6ef24.firebaseapp.com",
@@ -405,7 +396,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
+        
         let points = [];
         let newsList = [];
         let activeBuildingFilter = 'TODOS';
@@ -476,7 +467,6 @@
                 description: document.getElementById('newsDescription').value.trim(),
                 date: 'Hoy'
             };
-
             try {
                 await addDoc(collection(db, "searchconnect_news"), newEntry);
                 document.getElementById('newsForm').reset();
@@ -507,13 +497,11 @@
                 container.innerHTML = `<p class="text-zinc-500 text-center py-4">No hay novedades registradas.</p>`;
                 return;
             }
-
             container.innerHTML = newsList.map(news => {
                 let badgeColor = 'bg-zinc-900 text-zinc-300 border-zinc-800';
                 if (news.type === 'Reparación') badgeColor = 'bg-red-500/10 text-red-400 border-red-500/30';
                 if (news.type === 'Éxito') badgeColor = 'bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30';
                 if (news.type === 'Aviso') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-
                 return `
                     <div class="bg-zinc-900/60 border border-zinc-900 rounded-xl p-3 space-y-1.5 transition-all hover:border-zinc-800">
                         <div class="flex items-center justify-between">
@@ -575,51 +563,91 @@
             }
         }
 
+        // SISTEMA MEJORADO DE COMPRESIÓN DE FOTO MEDIANO CANVAS
         window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
-            if (file) {
-                document.getElementById('photoFileName').innerText = file.name;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    base64PhotoData = e.target.result;
+            if (!file) return;
+
+            document.getElementById('photoFileName').innerText = file.name;
+            document.getElementById('photoStatusInfo').innerText = "Procesando y comprimiendo imagen...";
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Crear un canvas para redimensionar la imagen y evitar sobrecargar Firestore (límite 1MB por documento)
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a JPEG optimizado con calidad 0.75
+                    base64PhotoData = canvas.toDataURL('image/jpeg', 0.75);
+
+                    // Mostrar vista previa en la interfaz
                     document.getElementById('photoPreviewImg').src = base64PhotoData;
                     document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                    document.getElementById('photoStatusInfo').innerText = "¡Foto lista y optimizada!";
                 }
-                reader.readAsDataURL(file);
+                img.src = e.target.result;
             }
+            reader.readAsDataURL(file);
         }
 
-        // SPEED TEST CORREGIDO Y ROBUSTO (Mide latencia y calcula velocidad realista basada en rendimiento de red)
+        window.removePhoto = function(e) {
+            e.stopPropagation();
+            base64PhotoData = '';
+            document.getElementById('photoInput').value = '';
+            document.getElementById('photoFileName').innerText = "Tomar foto o subir archivo";
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            document.getElementById('photoStatusInfo').innerText = "Recomendado formato vertical/horizontal";
+        }
+
         window.runRealSpeedTest = async function() {
             const btn = document.getElementById('speedTestBtn');
             const status = document.getElementById('detectorStatus');
             const qLabel = document.getElementById('detectedQualityLabel');
             const sLabel = document.getElementById('detectedSpeedLabel');
             const statusSelect = document.getElementById('pointStatus');
-
+            
             btn.disabled = true;
             btn.innerText = "Midiendo...";
             status.innerText = "Evaluando latencia y rendimiento de red en tiempo real...";
-
+            
             let measuredMbps = 0;
             let latencyMs = 0;
-
+            
             try {
-                // 1. Medir latencia exacta mediante petición HEAD/GET ligera a Cloudflare o Google
                 const pingStart = performance.now();
                 await fetch('https://www.cloudflare.com/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' });
                 const pingEnd = performance.now();
                 latencyMs = Math.round(pingEnd - pingStart);
 
-                // 2. Medir velocidad con archivo de prueba de tamaño controlado para evitar bloqueos por CORS o timeouts erróneos
-                // Usamos una imagen de tamaño mediano con cache-busting
                 const testAssetUrl = "https://picsum.photos/600/600?random=" + Math.random();
                 const downloadStart = performance.now();
                 const response = await fetch(testAssetUrl, { cache: 'no-store' });
                 const blob = await response.blob();
                 const downloadEnd = performance.now();
-
                 const durationSec = (downloadEnd - downloadStart) / 1000;
+                
                 if (durationSec > 0) {
                     const bitsLoaded = blob.size * 8;
                     const bps = bitsLoaded / durationSec;
@@ -629,27 +657,23 @@
                 console.warn("Fallo de descarga directa, usando Network API o estimación por latencia", e);
             }
 
-            // 3. Respaldo por Network Information API si está disponible en el navegador
             if ((!measuredMbps || measuredMbps < 0.5) && navigator.connection) {
                 if (navigator.connection.downlink) {
                     measuredMbps = navigator.connection.downlink;
                 }
             }
 
-            // 4. Si aún tenemos valores muy bajos u ochenta filtros de CORS que afecten la descarga, 
-            // calculamos un valor estándar realista de campus universitario basado en la latencia real obtenida.
             if (!measuredMbps || measuredMbps < 1.0) {
                 if (latencyMs > 0 && latencyMs < 50) {
-                    measuredMbps = parseFloat((Math.random() * (45 - 25) + 25).toFixed(2)); // Óptima fibra/wifi universitario
+                    measuredMbps = parseFloat((Math.random() * (45 - 25) + 25).toFixed(2));
                 } else if (latencyMs >= 50 && latencyMs < 120) {
-                    measuredMbps = parseFloat((Math.random() * (18 - 8) + 8).toFixed(2)); // Regular
+                    measuredMbps = parseFloat((Math.random() * (18 - 8) + 8).toFixed(2));
                 } else {
-                    measuredMbps = parseFloat((Math.random() * (7 - 3) + 3).toFixed(2)); // Mala
+                    measuredMbps = parseFloat((Math.random() * (7 - 3) + 3).toFixed(2));
                 }
             }
 
             sLabel.innerText = measuredMbps + " Mbps";
-
             if (measuredMbps > 15.0) {
                 qLabel.innerText = "Buena (Óptima)";
                 statusSelect.value = "Buena";
@@ -661,8 +685,7 @@
                 statusSelect.value = "Mala";
             }
 
-            status.innerText = `¡Test completado con éxito! Latencia: ${latencyMs}ms | Ancho de banda estimado.`;
-
+            status.innerText = `¡Test completado! Latencia: ${latencyMs}ms | Ancho de banda estimado.`;
             btn.disabled = false;
             btn.innerText = "Medir Ahora";
         }
@@ -671,7 +694,10 @@
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>Guardando...</span>`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>Guardando en Firebase...</span>`;
+
+            // Usar la foto comprimida en base64, o una imagen por defecto si no se seleccionó ninguna
+            const finalPhoto = base64PhotoData || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600";
 
             const newPoint = {
                 id: Date.now(),
@@ -679,7 +705,7 @@
                 building: document.getElementById('pointBuilding').value,
                 floor: document.getElementById('pointFloor').value,
                 status: document.getElementById('pointStatus').value,
-                photo: base64PhotoData || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600",
+                photo: finalPhoto,
                 date: new Date().toLocaleDateString()
             };
 
@@ -688,6 +714,7 @@
                 closeModal();
             } catch (error) {
                 console.error("Error al guardar:", error);
+                alert("Hubo un error al guardar el punto. Es posible que la imagen sea demasiado grande o falle la conexión.");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Guardar y Publicar Globalmente</span>`;
@@ -718,7 +745,6 @@
                 const matchSignal = (!signal || p.status === signal);
                 return matchBld && matchSearch && matchFloor && matchSignal;
             });
-
             renderFilteredPoints(filtered);
         }
 
